@@ -22,7 +22,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(nullable=False)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default='USD')
-    created_at: Mapped[str] = mapped_column(nullable=False)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
 
 
     def serialize(self):
@@ -31,7 +31,7 @@ class User(db.Model):
             "full_name": self.full_name,
             "email": self.email,
             "currency": self.currency,
-            "created_at": self.created_at
+            "created_at": self.created_at.isoformat() if self.created_at else None
         }
     
 class Account(db.Model):
