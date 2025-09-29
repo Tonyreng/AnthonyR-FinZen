@@ -51,3 +51,23 @@ class Account(db.Model):
             "type": self.type.value,
             "created_at": self.created_at.isoformat() if self.created_at else None
         } 
+    
+class Transaction(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    amount: Mapped[float] = mapped_column(nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    date: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
+    is_recurring: Mapped[bool] = mapped_column(nullable=False, default=False)
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "account_id": self.account_id,
+            "user_id": self.user_id,
+            "amount": self.amount,
+            "description": self.description,
+            "date": self.date.isoformat() if self.date else None,
+            "is_recurring": self.is_recurring
+        }
