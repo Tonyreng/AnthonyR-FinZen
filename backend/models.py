@@ -1,7 +1,7 @@
 
 from datetime import datetime, timezone
 import enum
-from sqlalchemy import String, Boolean
+from sqlalchemy import ForeignKey, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 from database import db
 
@@ -36,7 +36,7 @@ class User(db.Model):
     
 class Account(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     balance: Mapped[float] = mapped_column(nullable=False, default=0.0)
     type: Mapped[AccountType] = mapped_column(nullable=False)
