@@ -63,6 +63,7 @@ class Account(db.Model):
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
 
     user = db.relationship("User", back_populates="accounts")
+    transactions: Mapped[list["Transaction"]] = db.relationship("Transaction", back_populates="account")
 
     def serialize(self):
         return {
