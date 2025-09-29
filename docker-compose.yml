@@ -1,0 +1,32 @@
+services:
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: appdb
+        volumes:
+            - db_data:/var/lib/postgresql/data
+    backend:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+        environment:
+            DATABASE_URL: postgresql://postgres:postgres@db:5432/appdb
+            JWT_SECRET_KEY: super-secret
+        ports:
+            - "5000:5000"
+        depends_on:
+            - db
+        volumes:
+            - ./backend:/app
+    frontend:
+        build:
+            context: .
+            dockerfile: frontend/Dockerfile
+        ports:
+            - "3000:80"
+        depends_on:
+            - backend
+volumes:
+    db_data:
