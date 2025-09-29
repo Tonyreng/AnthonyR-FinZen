@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script de setup para el template fullstack
-echo "🚀 Configurando Fullstack Template..."
+echo "🚀 Configurando FinZen Fullstack Template..."
 
 # Verificar si Docker está corriendo
 if ! docker info > /dev/null 2>&1; then

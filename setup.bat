@@ -1,7 +1,7 @@
 @echo off
 REM Script de setup para Windows
 
-echo 🚀 Configurando Fullstack Template...
+echo 🚀 Configurando FinZen Fullstack Template...
 
 REM Verificar si Docker está corriendo
 docker info >nul 2>&1
