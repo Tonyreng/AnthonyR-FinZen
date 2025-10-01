@@ -31,6 +31,7 @@ class statusType(enum.Enum):
     overdue = "overdue"
 
 
+
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -108,6 +109,7 @@ class Transaction(db.Model):
     category = db.relationship("Category", back_populates="transactions")
     subscription = db.relationship("Subscription", back_populates="transactions")
     debt = db.relationship("Debt", back_populates="transactions")
+    installment = db.relationship("Installment", back_populates="transaction")
 
     def serialize(self , large=False):
         if not large:
@@ -141,7 +143,8 @@ class Transaction(db.Model):
                     "creditor": self.debt.creditor,
                     "remaining_amount": self.debt.remaining_amount,
                     "status": self.debt.status.value
-                } if self.debt else None    
+                } if self.debt else None,
+                "installment": self.installment.serialize() if self.installment else None
             }
     
 class Category(db.Model):
@@ -213,6 +216,34 @@ class Subscription(db.Model):
                 "transactions": [transaction.serialize() for transaction in self.transactions]
             }
 
+class Installment(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    transaction_id: Mapped[int] = mapped_column(ForeignKey("transaction.id"), nullable=True)
+    debt_id: Mapped[int] = mapped_column(ForeignKey("debt.id"), nullable=True)
+
+    amount: Mapped[float] = mapped_column(nullable=False)
+    last_payment_date: Mapped[datetime] = mapped_column(nullable=True)
+    due_date: Mapped[datetime] = mapped_column(nullable=False)
+    status: Mapped[statusType] = mapped_column(nullable=False, default=statusType.pending)
+
+    transaction = db.relationship("Transaction", back_populates="installment")
+    debt = db.relationship("Debt", back_populates="installments")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "debt_id": self.debt_id,
+            "amount": self.amount,
+            "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
+            "due_date": self.due_date.isoformat() if self.due_date else None,
+            "status": self.status.value,
+            "transaction": {
+                "id": self.transaction.id,
+                "amount": self.transaction.amount,
+                "date": self.transaction.date.isoformat()
+            } if self.transaction else None
+        }
+    
 class Debt(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
@@ -227,6 +258,7 @@ class Debt(db.Model):
 
     user = db.relationship("User", back_populates="debts")
     transactions: Mapped[list["Transaction"]] = db.relationship("Transaction", back_populates="debt")
+    installments: Mapped[list["Installment"]] = db.relationship("Installment", back_populates="debt")
 
     def serialize(self, large=False):
         if not large:
@@ -252,5 +284,6 @@ class Debt(db.Model):
                 "payment_date": self.payment_date.isoformat() if self.payment_date else None,
                 "status": self.status.value,
                 "created_at": self.created_at.isoformat() if self.created_at else None,
-                "transactions": [transaction.serialize() for transaction in self.transactions]
+                "transactions": [transaction.serialize() for transaction in self.transactions],
+                "installments": [installment.serialize() for installment in self.installments]
             }
