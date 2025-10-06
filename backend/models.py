@@ -1,7 +1,8 @@
 
 from datetime import datetime, timezone
+from decimal import Decimal
 import enum
-from sqlalchemy import ForeignKey, String, Boolean
+from sqlalchemy import ForeignKey, Numeric, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 from database import db
 
@@ -74,7 +75,7 @@ class Account(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    balance: Mapped[float] = mapped_column(nullable=False, default=0.0)
+    balance: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False, default=0.00)
     type: Mapped[AccountType] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
 
@@ -86,7 +87,7 @@ class Account(db.Model):
             "id": self.id,
             "user_id": self.user_id,
             "name": self.name,
-            "balance": self.balance,
+            "balance": str(self.balance),
             "type": self.type.value,
             "created_at": self.created_at.isoformat() if self.created_at else None
         } 
@@ -99,7 +100,7 @@ class Transaction(db.Model):
     subscription_id: Mapped[int] = mapped_column(ForeignKey("subscription.id"), nullable=True)
     debt_id: Mapped[int] = mapped_column(ForeignKey("debt.id"), nullable=True)
 
-    amount: Mapped[float] = mapped_column(nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     date: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
     is_recurring: Mapped[bool] = mapped_column(nullable=False, default=False)
@@ -109,7 +110,7 @@ class Transaction(db.Model):
     category = db.relationship("Category", back_populates="transactions")
     subscription = db.relationship("Subscription", back_populates="transactions")
     debt = db.relationship("Debt", back_populates="transactions")
-    installment = db.relationship("Installment", back_populates="transaction")
+    installment_links: Mapped[list["InstallmentTransaction"]] = db.relationship("InstallmentTransaction", back_populates="transaction")
 
     def serialize(self , large=False):
         if not large:
@@ -119,7 +120,7 @@ class Transaction(db.Model):
                 "user_id": self.user_id,
                 "category_id": self.category_id,
                 "subscription_id": self.subscription_id,
-                "amount": self.amount,
+                "amount": str(self.amount),
                 "description": self.description,
                 "date": self.date.isoformat() if self.date else None,
                 "is_recurring": self.is_recurring
@@ -131,7 +132,7 @@ class Transaction(db.Model):
                 "user_id": self.user_id,
                 "category_id": self.category_id,
                 "subscription_id": self.subscription_id,
-                "amount": self.amount,
+                "amount": str(self.amount),
                 "description": self.description,
                 "date": self.date.isoformat() if self.date else None,
                 "is_recurring": self.is_recurring,
@@ -144,7 +145,6 @@ class Transaction(db.Model):
                     "remaining_amount": self.debt.remaining_amount,
                     "status": self.debt.status.value
                 } if self.debt else None,
-                "installment": self.installment.serialize() if self.installment else None
             }
     
 class Category(db.Model):
@@ -179,7 +179,7 @@ class Subscription(db.Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    price: Mapped[float] = mapped_column(nullable=False)
+    price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     frequency: Mapped[frequencyType] = mapped_column(nullable=False)
     payment_date: Mapped[datetime] = mapped_column(nullable=False)
     last_payment_date: Mapped[datetime] = mapped_column(nullable=True)
@@ -195,7 +195,7 @@ class Subscription(db.Model):
                 "id": self.id,
                 "user_id": self.user_id,
                 "name": self.name,
-                "price": self.price,
+                "price": str(self.price),
                 "frequency": self.frequency.value,
                 "payment_date": self.payment_date.isoformat() if self.payment_date else None,
                 "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
@@ -207,7 +207,7 @@ class Subscription(db.Model):
                 "id": self.id,
                 "user_id": self.user_id,
                 "name": self.name,
-                "price": self.price,
+                "price": str(self.price),
                 "frequency": self.frequency.value,
                 "payment_date": self.payment_date.isoformat() if self.payment_date else None,
                 "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
@@ -218,39 +218,53 @@ class Subscription(db.Model):
 
 class Installment(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    transaction_id: Mapped[int] = mapped_column(ForeignKey("transaction.id"), nullable=True)
     debt_id: Mapped[int] = mapped_column(ForeignKey("debt.id"), nullable=True)
 
-    amount: Mapped[float] = mapped_column(nullable=False)
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     last_payment_date: Mapped[datetime] = mapped_column(nullable=True)
     due_date: Mapped[datetime] = mapped_column(nullable=False)
     status: Mapped[statusType] = mapped_column(nullable=False, default=statusType.pending)
 
-    transaction = db.relationship("Transaction", back_populates="installment")
+    
     debt = db.relationship("Debt", back_populates="installments")
+    installment_links: Mapped[list["InstallmentTransaction"]] = db.relationship("InstallmentTransaction", back_populates="installment")
 
     def serialize(self):
         return {
             "id": self.id,
             "debt_id": self.debt_id,
-            "amount": self.amount,
+            "amount": str(self.amount),
             "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
             "due_date": self.due_date.isoformat() if self.due_date else None,
             "status": self.status.value,
-            "transaction": {
-                "id": self.transaction.id,
-                "amount": self.transaction.amount,
-                "date": self.transaction.date.isoformat()
-            } if self.transaction else None
+            "installment_links": [link.serialize() for link in self.installment_links]
         }
     
+class InstallmentTransaction(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    installment_id: Mapped[int] = mapped_column(ForeignKey("installment.id"), nullable=False)
+    transaction_id: Mapped[int] = mapped_column(ForeignKey("transaction.id"), nullable=False)
+
+    amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+
+    installment = db.relationship("Installment", back_populates="installment_links" )
+    transaction = db.relationship("Transaction", back_populates="installment_links")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "installment_id": self.installment_id,
+            "transaction_id": self.transaction_id,
+            "amount": str(self.amount)
+        }
+
 class Debt(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     
     creditor: Mapped[str] = mapped_column(String(100), nullable=False)
-    total_amount: Mapped[float] = mapped_column(nullable=False)
-    remaining_amount: Mapped[float] = mapped_column(nullable=False)
+    total_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
+    remaining_amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     last_payment_date: Mapped[datetime] = mapped_column(nullable=True)
     payment_date: Mapped[datetime] = mapped_column(nullable=True)
     status: Mapped[statusType] = mapped_column(nullable=False, default=statusType.pending)
@@ -266,8 +280,8 @@ class Debt(db.Model):
                 "id": self.id,
                 "user_id": self.user_id,
                 "creditor": self.creditor,
-                "total_amount": self.total_amount,
-                "remaining_amount": self.remaining_amount,
+                "total_amount": str(self.total_amount),
+                "remaining_amount": str(self.remaining_amount),
                 "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
                 "payment_date": self.payment_date.isoformat() if self.payment_date else None,
                 "status": self.status.value,
@@ -278,8 +292,8 @@ class Debt(db.Model):
                 "id": self.id,
                 "user_id": self.user_id,
                 "creditor": self.creditor,
-                "total_amount": self.total_amount,
-                "remaining_amount": self.remaining_amount,
+                "total_amount": str(self.total_amount),
+                "remaining_amount": str(self.remaining_amount),
                 "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
                 "payment_date": self.payment_date.isoformat() if self.payment_date else None,
                 "status": self.status.value,
