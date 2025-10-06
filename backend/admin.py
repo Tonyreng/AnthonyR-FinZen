@@ -1,6 +1,6 @@
 import os
 from flask_admin import Admin
-from models import Account, Category, Debt, Installment, InstallmentTransaction, Subscription, Transaction, db, User
+from models import Account, Category, Debt, Installment, InstallmentTransaction, LoanGiven, Subscription, Transaction, db, User
 from flask_admin.contrib.sqla import ModelView
 
 def setup_admin(app):
@@ -15,6 +15,7 @@ def setup_admin(app):
     admin.add_view(ModelView(Transaction, db.session))
     admin.add_view(ModelView(Category, db.session))
     admin.add_view(ModelView(Subscription, db.session))
+    admin.add_view(ModelView(LoanGiven, db.session))
     admin.add_view(ModelView(Debt, db.session))
     admin.add_view(ModelView(Installment, db.session))
     admin.add_view(ModelView(InstallmentTransaction, db.session))
