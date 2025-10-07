@@ -2,7 +2,8 @@
 from datetime import datetime, timezone
 from decimal import Decimal
 import enum
-from sqlalchemy import ForeignKey, Numeric, String, Boolean
+from typing import Any
+from sqlalchemy import JSON, ForeignKey, Numeric, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
 from database import db
 
@@ -36,6 +37,10 @@ class ReminderType(enum.Enum):
     loan_given = "loan_given"
     subscription = "subscription"
 
+class ReportType(enum.Enum):
+    weekly = "weekly"
+    monthly = "monthly"
+    yearly = "yearly"
 
 
 class User(db.Model):
@@ -54,6 +59,7 @@ class User(db.Model):
     debts: Mapped[list["Debt"]] = db.relationship("Debt", back_populates="user")
     loans_given: Mapped[list["LoanGiven"]] = db.relationship("LoanGiven", back_populates="user")
     reminders: Mapped[list["Reminder"]] = db.relationship("Reminder", back_populates="user")
+    reports: Mapped[list["Report"]] = db.relationship("Report", back_populates="user")
 
     def serialize(self, large=False):
         if not large:
@@ -402,4 +408,27 @@ class Reminder(db.Model):
             "description": self.description,
             "reminder_date": self.reminder_date.isoformat() if self.reminder_date else None,
             "is_sent": self.is_sent
+        }
+    
+class Report(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+
+    period: Mapped[str] = mapped_column(String(50), nullable=False)
+    summary: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    type: Mapped[ReportType] = mapped_column(nullable=False, default=ReportType.monthly)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+    user = db.relationship("User", back_populates="reports")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "period": self.period,
+            "summary": self.summary,
+            "type": self.type.value,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
