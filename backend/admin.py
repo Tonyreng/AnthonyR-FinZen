@@ -1,12 +1,12 @@
 import os
 from flask_admin import Admin
-from models import Account, Category, Debt, Installment, InstallmentTransaction, LoanGiven, Subscription, Transaction, db, User
+from models import Account, Category, Debt, Installment, InstallmentTransaction, LoanGiven, Reminder, Subscription, Transaction, db, User
 from flask_admin.contrib.sqla import ModelView
 
 def setup_admin(app):
     app.secret_key = os.environ.get('FLASK_APP_KEY', 'sample key')
-    app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
-    admin = Admin(app, name='FinZen Admin', template_mode='bootstrap3')
+    app.config['FLASK_ADMIN_SWATCH'] = 'darkly'
+    admin = Admin(app, name='FinZen Admin', template_mode='bootstrap4')
 
     
     # Add your models here, for example this is how we add a the User model to the admin
@@ -19,6 +19,7 @@ def setup_admin(app):
     admin.add_view(ModelView(Debt, db.session))
     admin.add_view(ModelView(Installment, db.session))
     admin.add_view(ModelView(InstallmentTransaction, db.session))
+    admin.add_view(ModelView(Reminder, db.session))
 
     # You can duplicate that line to add new models
     # admin.add_view(ModelView(YourModelName, db.session))

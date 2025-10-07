@@ -31,6 +31,11 @@ class statusType(enum.Enum):
     paid = "paid"
     overdue = "overdue"
 
+class ReminderType(enum.Enum):
+    debt = "debt"
+    loan_given = "loan_given"
+    subscription = "subscription"
+
 
 
 class User(db.Model):
@@ -48,6 +53,7 @@ class User(db.Model):
     subscriptions: Mapped[list["Subscription"]] = db.relationship("Subscription", back_populates="user")
     debts: Mapped[list["Debt"]] = db.relationship("Debt", back_populates="user")
     loans_given: Mapped[list["LoanGiven"]] = db.relationship("LoanGiven", back_populates="user")
+    reminders: Mapped[list["Reminder"]] = db.relationship("Reminder", back_populates="user")
 
     def serialize(self, large=False):
         if not large:
@@ -70,7 +76,8 @@ class User(db.Model):
             "categories": [category.serialize() for category in self.categories],
             "subscriptions": [subscription.serialize() for subscription in self.subscriptions],
             "loans_given": [loan_given.serialize() for loan_given in self.loans_given],
-            "debts": [debt.serialize() for debt in self.debts]
+            "debts": [debt.serialize() for debt in self.debts],
+            "reminders": [reminder.serialize() for reminder in self.reminders]
         }
     
 class Account(db.Model):
@@ -199,6 +206,7 @@ class Subscription(db.Model):
 
     user = db.relationship("User", back_populates="subscriptions")
     transactions: Mapped[list["Transaction"]] = db.relationship("Transaction", back_populates="subscription")
+    reminders: Mapped[list["Reminder"]] = db.relationship("Reminder", back_populates="subscription")
 
     def serialize(self, large=False):
         if not large:
@@ -224,7 +232,8 @@ class Subscription(db.Model):
                 "last_payment_date": self.last_payment_date.isoformat() if self.last_payment_date else None,
                 "is_active": self.is_active,
                 "created_at": self.created_at.isoformat() if self.created_at else None,
-                "transactions": [transaction.serialize() for transaction in self.transactions]
+                "transactions": [transaction.serialize() for transaction in self.transactions],
+                "reminders": [reminder.serialize() for reminder in self.reminders]
             }
 
 class Installment(db.Model):
@@ -287,6 +296,7 @@ class Debt(db.Model):
     user = db.relationship("User", back_populates="debts")
     transactions: Mapped[list["Transaction"]] = db.relationship("Transaction", back_populates="debt")
     installments: Mapped[list["Installment"]] = db.relationship("Installment", back_populates="debt")
+    reminders: Mapped[list["Reminder"]] = db.relationship("Reminder", back_populates="debt")
 
     def serialize(self, large=False):
         if not large:
@@ -313,7 +323,8 @@ class Debt(db.Model):
                 "status": self.status.value,
                 "created_at": self.created_at.isoformat() if self.created_at else None,
                 "transactions": [transaction.serialize() for transaction in self.transactions],
-                "installments": [installment.serialize() for installment in self.installments]
+                "installments": [installment.serialize() for installment in self.installments],
+                "reminders": [reminder.serialize() for reminder in self.reminders]
             }
         
 class LoanGiven(db.Model):
@@ -331,6 +342,7 @@ class LoanGiven(db.Model):
     user = db.relationship("User", back_populates="loans_given")
     transactions: Mapped[list["Transaction"]] = db.relationship("Transaction", back_populates="loan_given")
     installments: Mapped[list["Installment"]] = db.relationship("Installment", back_populates="loan_given")
+    reminders: Mapped[list["Reminder"]] = db.relationship("Reminder", back_populates="loan_given")
 
     def serialize(self, large=False):
         if not large:
@@ -357,5 +369,37 @@ class LoanGiven(db.Model):
                 "status": self.status.value,
                 "created_at": self.created_at.isoformat() if self.created_at else None,
                 "transactions": [transaction.serialize() for transaction in self.transactions],
-                "installments": [installment.serialize() for installment in self.installments]
+                "installments": [installment.serialize() for installment in self.installments],
+                "reminders": [reminder.serialize() for reminder in self.reminders]
             }
+
+class Reminder(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    debt_id: Mapped[int] = mapped_column(ForeignKey("debt.id"), nullable=True)
+    loan_given_id: Mapped[int] = mapped_column(ForeignKey("loan_given.id"), nullable=True)
+    subscription_id: Mapped[int] = mapped_column(ForeignKey("subscription.id"), nullable=True)
+
+    type: Mapped[ReminderType] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    reminder_date: Mapped[datetime] = mapped_column(nullable=False)
+    is_sent: Mapped[bool] = mapped_column(nullable=False, default=False)
+
+    user = db.relationship("User", back_populates="reminders")
+    debt = db.relationship("Debt", back_populates="reminders")
+    loan_given = db.relationship("LoanGiven", back_populates="reminders")
+    subscription = db.relationship("Subscription", back_populates="reminders")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "debt_id": self.debt_id,
+            "loan_given_id": self.loan_given_id,
+            "subscription_id": self.subscription_id,
+            "title": self.title,
+            "description": self.description,
+            "reminder_date": self.reminder_date.isoformat() if self.reminder_date else None,
+            "is_sent": self.is_sent
+        }
