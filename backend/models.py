@@ -4,7 +4,7 @@ from decimal import Decimal
 import enum
 from typing import Any
 from sqlalchemy import JSON, ForeignKey, Numeric, String, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, validates
 from database import db
 
 class AccountType(enum.Enum):
@@ -256,6 +256,14 @@ class Installment(db.Model):
     debt = db.relationship("Debt", back_populates="installments")
     loan_given = db.relationship("LoanGiven", back_populates="installments")
     installment_links: Mapped[list["InstallmentTransaction"]] = db.relationship("InstallmentTransaction", back_populates="installment")
+
+    @validates('debt_id', 'loan_given_id')
+    def validate_ownership(self, key, value):
+        if self.debt_id and self.loan_given_id:
+            raise ValueError("Installment cannot belong to both debt and loan_given")
+        if not self.debt_id and not self.loan_given_id:
+            raise ValueError("Installment must belong to either debt or loan_given")
+        return value
 
     def serialize(self):
         return {
