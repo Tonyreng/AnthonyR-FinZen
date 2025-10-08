@@ -42,6 +42,11 @@ class ReportType(enum.Enum):
     monthly = "monthly"
     yearly = "yearly"
 
+class TransactionType(enum.Enum):
+    general = "general"
+    subscription = "subscription"
+    debt_payment = "debt_payment"
+    loan_payment = "loan_payment"
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -112,11 +117,12 @@ class Transaction(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     account_id: Mapped[int] = mapped_column(ForeignKey("account.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), nullable=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), nullable=False)
     subscription_id: Mapped[int] = mapped_column(ForeignKey("subscription.id"), nullable=True)
     debt_id: Mapped[int] = mapped_column(ForeignKey("debt.id"), nullable=True)
     loan_given_id: Mapped[int] = mapped_column(ForeignKey("loan_given.id"), nullable=True)
 
+    type: Mapped[TransactionType] = mapped_column(nullable=False)
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     description: Mapped[str] = mapped_column(String(255), nullable=True)
     date: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
@@ -130,6 +136,35 @@ class Transaction(db.Model):
     loan_given = db.relationship("LoanGiven", back_populates="transactions")
     installment_links: Mapped[list["InstallmentTransaction"]] = db.relationship("InstallmentTransaction", back_populates="transaction")
 
+    @validates('debt_id', 'loan_given_id', 'subscription_id', 'type')
+    def validate_ownership(self, key, value):
+        debt_id = value if key == 'debt_id' else getattr(self, 'debt_id', None)
+        loan_given_id = value if key == 'loan_given_id' else getattr(self, 'loan_given_id', None)
+        subscription_id = value if key == 'subscription_id' else getattr(self, 'subscription_id', None)
+        transaction_type = value if key == 'type' else getattr(self, 'type', None)
+
+        assigned = [bool(debt_id), bool(loan_given_id), bool(subscription_id)]
+
+        if sum(assigned) > 1:
+            raise ValueError("Transaction cannot be linked to more than one entity (Debt, LoanGiven, or Subscription).")
+        
+        if sum(assigned) == 0 and transaction_type != TransactionType.general:
+            raise ValueError("This transaction type must be linked to a related entity.")
+
+        if transaction_type == TransactionType.debt_payment and not debt_id:
+            raise ValueError("A 'debt_payment' type transaction must be linked to a Debt (debt_id).")
+        
+        if transaction_type == TransactionType.loan_payment and not loan_given_id:
+            raise ValueError("A 'loan_payment' type transaction must be linked to a LoanGiven (loan_given_id).")
+        
+        if transaction_type == TransactionType.subscription and not subscription_id:
+            raise ValueError("A 'subscription' type transaction must be linked to a Subscription (subscription_id).")
+        
+        if transaction_type == TransactionType.general and any([debt_id, loan_given_id, subscription_id]):
+            raise ValueError("A 'general' type transaction cannot be linked to debt, loan_given, or subscription.")
+        
+        return value
+        
     def serialize(self , large=False):
         if not large:
             return {
@@ -138,6 +173,7 @@ class Transaction(db.Model):
                 "user_id": self.user_id,
                 "category_id": self.category_id,
                 "subscription_id": self.subscription_id,
+                "type": self.type.value,
                 "amount": str(self.amount),
                 "description": self.description,
                 "date": self.date.isoformat() if self.date else None,
@@ -405,6 +441,30 @@ class Reminder(db.Model):
     loan_given = db.relationship("LoanGiven", back_populates="reminders")
     subscription = db.relationship("Subscription", back_populates="reminders")
 
+    @validates("debt_id", "loan_given_id", "subscription_id", "type")
+    def validate_ownership(self, key, value):
+
+        debt_id = value if key == "debt_id" else getattr(self, "debt_id", None)
+        loan_given_id = value if key == "loan_given_id" else getattr(self, "loan_given_id", None)
+        subscription_id = value if key == "subscription_id" else getattr(self, "subscription_id", None)
+        reminder_type = value if key == "type" else getattr(self, "type", None)
+
+        assigned = [bool(debt_id), bool(loan_given_id), bool(subscription_id)]
+        if sum(assigned) > 1:
+            raise ValueError("Reminder cannot belong to more than one entity (debt, loan_given, or subscription).")
+
+        if sum(assigned) == 0:
+            raise ValueError("Reminder must belong to at least one entity (debt, loan_given, or subscription).")
+
+        if reminder_type == ReminderType.debt and not debt_id:
+            raise ValueError("A 'debt' type reminder must be linked to a Debt (debt_id).")
+        if reminder_type == ReminderType.loan_given and not loan_given_id:
+            raise ValueError("A 'loan_given' type reminder must be linked to a LoanGiven (loan_given_id).")
+        if reminder_type == ReminderType.subscription and not subscription_id:
+            raise ValueError("A 'subscription' type reminder must be linked to a Subscription (subscription_id).")
+
+        return value
+
     def serialize(self):
         return {
             "id": self.id,
@@ -412,6 +472,7 @@ class Reminder(db.Model):
             "debt_id": self.debt_id,
             "loan_given_id": self.loan_given_id,
             "subscription_id": self.subscription_id,
+            "type": self.type.value,
             "title": self.title,
             "description": self.description,
             "reminder_date": self.reminder_date.isoformat() if self.reminder_date else None,
