@@ -53,7 +53,7 @@ class User(db.Model):
 
     full_name: Mapped[str] = mapped_column(String(50), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
-    password_hash: Mapped[str] = mapped_column(nullable=False)
+    password_hash: Mapped[str] = mapped_column(nullable=True)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default='USD')
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
 
@@ -186,6 +186,7 @@ class Transaction(db.Model):
                 "user_id": self.user_id,
                 "category_id": self.category_id,
                 "subscription_id": self.subscription_id,
+                "type": self.type.value,
                 "amount": str(self.amount),
                 "description": self.description,
                 "date": self.date.isoformat() if self.date else None,
