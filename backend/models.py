@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 import enum
 from typing import Any
-from sqlalchemy import JSON, ForeignKey, Numeric, String, Boolean
+from sqlalchemy import JSON, CheckConstraint, ForeignKey, Numeric, String, Boolean, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, validates
 from database import db
 
@@ -92,6 +92,12 @@ class User(db.Model):
         }
     
 class Account(db.Model):
+
+    __table_args__ = (
+        CheckConstraint('balance >= 0', name='positive_balance'),
+        UniqueConstraint('user_id', 'name', name='unique_user_account'),
+    )
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
 
@@ -99,7 +105,7 @@ class Account(db.Model):
     balance: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False, default=0.00)
     type: Mapped[AccountType] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
-
+    
     user = db.relationship("User", back_populates="accounts")
     transactions: Mapped[list["Transaction"]] = db.relationship("Transaction", back_populates="account")
 
@@ -115,16 +121,16 @@ class Account(db.Model):
     
 class Transaction(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"), nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), nullable=False)
+    account_id: Mapped[int] = mapped_column(ForeignKey("account.id"), nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False, index=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), nullable=False, index=True)
     subscription_id: Mapped[int] = mapped_column(ForeignKey("subscription.id"), nullable=True)
     debt_id: Mapped[int] = mapped_column(ForeignKey("debt.id"), nullable=True)
     loan_given_id: Mapped[int] = mapped_column(ForeignKey("loan_given.id"), nullable=True)
 
-    type: Mapped[TransactionType] = mapped_column(nullable=False)
+    type: Mapped[TransactionType] = mapped_column(nullable=False, index=True)
     amount: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
-    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(String(255), nullable=True, index=True)
     date: Mapped[datetime] = mapped_column(nullable=False, default=lambda: datetime.now(timezone.utc))
     is_recurring: Mapped[bool] = mapped_column(nullable=False, default=False)
 
@@ -209,6 +215,11 @@ class Transaction(db.Model):
             }
     
 class Category(db.Model):
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'name', name='unique_user_category'),
+    )
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
 
