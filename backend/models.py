@@ -88,7 +88,8 @@ class User(db.Model):
             "subscriptions": [subscription.serialize() for subscription in self.subscriptions],
             "loans_given": [loan_given.serialize() for loan_given in self.loans_given],
             "debts": [debt.serialize() for debt in self.debts],
-            "reminders": [reminder.serialize() for reminder in self.reminders]
+            "reminders": [reminder.serialize() for reminder in self.reminders],
+            "reports": [report.serialize() for report in self.reports]
         }
     
 class Account(db.Model):
@@ -307,9 +308,12 @@ class Installment(db.Model):
 
     @validates('debt_id', 'loan_given_id')
     def validate_ownership(self, key, value):
-        if self.debt_id and self.loan_given_id:
+        debt_id = value if key == 'debt_id' else getattr(self, 'debt_id', None)
+        loan_given_id = value if key == 'loan_given_id' else getattr(self, 'loan_given_id', None)
+
+        if debt_id and loan_given_id:
             raise ValueError("Installment cannot belong to both debt and loan_given")
-        if not self.debt_id and not self.loan_given_id:
+        if not debt_id and not loan_given_id:
             raise ValueError("Installment must belong to either debt or loan_given")
         return value
 
