@@ -5,7 +5,7 @@ type Props = {
     paragraph: string;
 };
 
-function HeaderForm({ title, paragraph }: Props) {
+function FormHeader({ title, paragraph }: Props) {
     return (
         <Box sx={{ mb: 3 }}>
             <Typography sx={{ mb: 1 }} variant="h2">
@@ -18,4 +18,4 @@ function HeaderForm({ title, paragraph }: Props) {
     );
 }
 
-export default HeaderForm;
+export default FormHeader;

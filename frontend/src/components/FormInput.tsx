@@ -9,7 +9,7 @@ type Props = {
     styleInput?: object;
 };
 
-const InputForm = ({ name, rules, label, type, styleInput }: Props) => {
+const FormInput = ({ name, rules, label, type, styleInput }: Props) => {
     const { control, formState, getFieldState } = useFormContext();
     const { error } = getFieldState(name, formState);
 
@@ -48,4 +48,4 @@ const InputForm = ({ name, rules, label, type, styleInput }: Props) => {
     );
 };
 
-export default InputForm;
+export default FormInput;
