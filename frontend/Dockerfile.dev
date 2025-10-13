@@ -1,0 +1,23 @@
+# Dockerfile para desarrollo con hot-reload
+FROM node:20-alpine
+
+# Instalar pnpm
+RUN npm install -g pnpm
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+
+# Instalar dependencias
+RUN pnpm install --frozen-lockfile
+
+# El código fuente se montará como volumen
+# No es necesario copiarlo aquí
+
+# Exponer puerto de desarrollo de Vite
+EXPOSE 5173
+
+# Comando para iniciar el servidor de desarrollo de Vite
+CMD ["pnpm", "run", "dev", "--host", "0.0.0.0"]
