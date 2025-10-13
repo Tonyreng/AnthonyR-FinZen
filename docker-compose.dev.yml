@@ -1,0 +1,45 @@
+services:
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: appdb
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        ports:
+            - '5432:5432'
+
+    backend:
+        build:
+            context: .
+            dockerfile: backend/Dockerfile
+        environment:
+            DATABASE_URL: postgresql://postgres:postgres@db:5432/appdb
+            JWT_SECRET_KEY: super-secret
+            FLASK_DEBUG: '1'
+        ports:
+            - '5000:5000'
+        depends_on:
+            - db
+        volumes:
+            - ./backend:/app
+            - .:/workspace
+        command: flask run --host=0.0.0.0 --reload
+
+    frontend:
+        build:
+            context: .
+            dockerfile: frontend/Dockerfile.dev
+        ports:
+            - '3000:5173' # Vite usa el puerto 5173 por defecto
+        depends_on:
+            - backend
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules # Evitar sobrescribir node_modules
+        environment:
+            - VITE_API_URL=http://localhost:5000
+
+volumes:
+    db_data:
