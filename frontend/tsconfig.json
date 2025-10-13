@@ -9,7 +9,14 @@
         "strict": true,
         "jsx": "react-jsx",
         "types": ["vite/client", "node"],
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "allowJs": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true
     },
     "include": ["src"]
 }
