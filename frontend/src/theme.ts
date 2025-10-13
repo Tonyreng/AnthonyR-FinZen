@@ -5,7 +5,7 @@ export const theme = createTheme({
         mode: 'dark',
         primary: {
             main: 'rgb(17, 115, 212)', // azul principal
-            light: '#2563EB', // hover
+            light: '#2563EB ', // hover
             dark: '#1E3A8A', // variantes más oscuras
             contrastText: '#FFFFFF',
         },
@@ -23,7 +23,7 @@ export const theme = createTheme({
         fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
         h1: { fontWeight: 700, fontSize: '2.5rem' },
         h2: { fontWeight: 600, fontSize: '2rem' },
-        body1: { color: '#E5E7EB' },
+        body1: { color: '#ffffffff' },
         button: { textTransform: 'none', fontWeight: 600 },
     },
     shape: {
@@ -43,13 +43,20 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#111827',
-                        '& fieldset': { borderColor: '#1F2937' },
+                        backgroundColor: 'rgb(16, 25, 34)',
+                        '& fieldset': { borderColor: '#153053ff' },
                         '&:hover fieldset': { borderColor: '#2563EB' },
-                        '&.Mui-focused fieldset': { borderColor: '#1D4ED8' },
+                        '&.Mui-focused fieldset': { borderColor: '#436cddff' },
                     },
-                    '& input': { color: '#F9FAFB' },
+                    '& input': { color: '#ffffffff' },
                     '& label': { color: '#9CA3AF' },
+                },
+            },
+        },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    '& input': { height: '1em' },
                 },
             },
         },
