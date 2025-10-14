@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import UserForm from '../components/UserForm';
 
 export type LoginFormInputs = {
@@ -18,8 +18,11 @@ function Login(props: Props) {
         },
     });
 
-    const onSubmit = (data: LoginFormInputs) => {
+    const onSubmit: SubmitHandler<LoginFormInputs> = (
+        data: LoginFormInputs
+    ) => {
         console.log(data);
+        methods.reset();
     };
 
     return <UserForm onSubmit={onSubmit} methods={methods} />;

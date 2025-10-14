@@ -24,6 +24,7 @@ services:
             - db
         volumes:
             - ./backend:/app
+            - ./logs:/app/logs
             - .:/workspace
         command: flask run --host=0.0.0.0 --reload
 

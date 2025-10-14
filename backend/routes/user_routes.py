@@ -1,0 +1,49 @@
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from models import User, db
+import logging
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+user_bp = Blueprint("user_bp", __name__)
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+
+@user_bp.route("/user/login", methods=["POST"])
+@limiter.limit("5 per minute")
+def login():
+    try:
+        data = request.get_json()
+        email = data.get("email", "").strip().lower()
+        password = data.get("password", "")
+
+        if not data or not email or not password:
+            logging.warning(f"Login attempt with missing credentials.")
+            return jsonify({"msg": "Missing email or password"}), 400
+
+        user = User.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            access_token = create_access_token(identity=user.id, fresh=True)
+            refresh_token = create_refresh_token(identity=user.id)
+            logging.info(f"User logged in successfully: {email}")
+
+            return jsonify({
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "user": user.serialize(),
+                "msg": "Login successful"
+            }), 200
+        else:
+            logging.warning(f"Failed login attempt for email: {email}.")
+            return jsonify({"msg": "Invalid credentials. Please verify your email and password."}), 401
+    except Exception as e:
+        logging.error(f"Database error during login: {str(e)}")
+        return jsonify({"msg": "Internal server error"}), 500
+        
+    
+    

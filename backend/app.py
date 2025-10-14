@@ -7,11 +7,14 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
+from routes import register_routes
 from database import db
 from models import *
 from admin import setup_admin
-from routes.auth import auth_bp
-from routes.users import users_bp
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+
 
 # Load environment variables
 load_dotenv()
@@ -23,6 +26,34 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+
+
+# Crear carpeta de logs si no existe
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+
+# Configurar formato de log
+formatter = logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    "%Y-%m-%d %H:%M:%S"
+)
+
+# Archivo de log (rotativo para evitar que crezca demasiado)
+file_handler = RotatingFileHandler(
+    "logs/app.log", maxBytes=2_000_000, backupCount=5
+)
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.INFO)
+
+# Log en consola (útil para Docker)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+console_handler.setLevel(logging.INFO)
+
+# Agregar ambos handlers al logger principal de Flask
+app.logger.addHandler(file_handler)
+app.logger.addHandler(console_handler)
+app.logger.setLevel(logging.INFO)
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
@@ -48,8 +79,11 @@ CORS(app)
 setup_admin(app)
 
 # Register Blueprints
-app.register_blueprint(auth_bp, url_prefix='/api/auth')
-app.register_blueprint(users_bp, url_prefix='/api/users')
+register_routes(app)
+
+# Initialize rate limiter (after registering blueprints)
+from routes.user_routes import limiter
+limiter.init_app(app)  
 
 # Basic route for testing
 @app.route('/api/health')
