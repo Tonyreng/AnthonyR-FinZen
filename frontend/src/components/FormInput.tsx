@@ -24,6 +24,7 @@ const FormInput = ({ name, rules, label, type, styleInput }: Props) => {
                         {...field}
                         label={label}
                         variant="outlined"
+                        type={name === 'password' ? 'password' : 'text'}
                         fullWidth
                         required
                         error={!!error}

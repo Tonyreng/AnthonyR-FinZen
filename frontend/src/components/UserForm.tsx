@@ -1,4 +1,4 @@
-import { FormProvider, SubmitHandler, UseFormReturn } from 'react-hook-form';
+import { FormProvider, UseFormReturn } from 'react-hook-form';
 import { LoginFormInputs } from '../pages/Login';
 import { Box } from '@mui/material';
 import FormInput from './FormInput';
@@ -6,7 +6,7 @@ import FormHeader from './FormHeader';
 import FormButton from './FormButton';
 
 type Props = {
-    onSubmit?: SubmitHandler<LoginFormInputs>;
+    onSubmit: (data: LoginFormInputs) => void;
     methods: UseFormReturn<LoginFormInputs>;
 };
 
@@ -20,9 +20,7 @@ const UserForm = ({ onSubmit, methods }: Props) => {
             <FormProvider {...methods}>
                 <Box
                     component="form"
-                    onSubmit={methods.handleSubmit(
-                        onSubmit ? onSubmit : () => {}
-                    )}
+                    onSubmit={methods.handleSubmit(onSubmit)}
                     sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
                 >
                     <FormInput

@@ -7,15 +7,20 @@ import { router } from './routes.tsx';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from './theme.ts';
 import { CssBaseline } from '@mui/material';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 const Main = () => (
     <StrictMode>
-        <StoreProvider>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <RouterProvider router={router} />
-            </ThemeProvider>
-        </StoreProvider>
+        <QueryClientProvider client={queryClient}>
+            <StoreProvider>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <RouterProvider router={router} />
+                </ThemeProvider>
+            </StoreProvider>
+        </QueryClientProvider>
     </StrictMode>
 );
 

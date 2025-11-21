@@ -18,9 +18,7 @@ function Login(props: Props) {
         },
     });
 
-    const onSubmit: SubmitHandler<LoginFormInputs> = (
-        data: LoginFormInputs
-    ) => {
+    const onSubmit = (data: LoginFormInputs) => {
         console.log(data);
         methods.reset();
     };
