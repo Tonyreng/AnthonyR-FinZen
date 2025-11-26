@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from models import User, db
 import logging
+from datetime import timedelta
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -19,7 +20,7 @@ def login():
     try:
         data = request.get_json()
         email = data.get("email", "").strip().lower()
-        password = data.get("password", "")
+        password = data.get("password")
 
         if not data or not email or not password:
             logging.warning(f"Login attempt with missing credentials.")
@@ -28,8 +29,8 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
-            access_token = create_access_token(identity=user.id, fresh=True)
-            refresh_token = create_refresh_token(identity=user.id)
+            access_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15))
+            refresh_token = create_refresh_token(identity=user.id, expires_delta=timedelta(days=30))
             logging.info(f"User logged in successfully: {email}")
 
             return jsonify({
