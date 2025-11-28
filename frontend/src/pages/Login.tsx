@@ -1,11 +1,8 @@
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import UserForm from '../components/UserForm';
-
-export type LoginFormInputs = {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-};
+import { LoginFormInputs } from '../types';
+import { useNavigate } from 'react-router-dom';
+import { useLogin } from '../hooks/useLogin';
 
 type Props = {};
 
@@ -18,8 +15,11 @@ function Login(props: Props) {
         },
     });
 
+    const navigate = useNavigate();
+    const loginMutation = useLogin(navigate);
+
     const onSubmit = (data: LoginFormInputs) => {
-        console.log(data);
+        loginMutation.mutate(data);
         methods.reset();
     };
 
