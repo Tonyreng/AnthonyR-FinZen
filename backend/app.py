@@ -70,10 +70,18 @@ db.init_app(app)
 
 # JWT Configuration
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')
+app.config['JWT_TOKEN_LOCATION'] = ['cookies', 'headers']
+app.config['JWT_COOKIE_SECURE'] = False  # True en producción con HTTPS
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # Activar en producción
+app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 jwt = JWTManager(app)
 
-# Enable CORS
-CORS(app)
+# Enable CORS with credentials support
+CORS(app, 
+     supports_credentials=True,
+     origins=['http://localhost:3000'],
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 # Setup admin
 setup_admin(app)

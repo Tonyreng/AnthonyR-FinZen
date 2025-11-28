@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, set_refresh_cookies
 from models import User, db
 import logging
 from datetime import timedelta
@@ -33,12 +33,15 @@ def login():
             refresh_token = create_refresh_token(identity=user.id, expires_delta=timedelta(days=30))
             logging.info(f"User logged in successfully: {email}")
 
-            return jsonify({
+            resp = jsonify({
                 "access_token": access_token,
-                "refresh_token": refresh_token,
                 "user": user.serialize(),
                 "msg": "Login successful"
-            }), 200
+            })
+
+            set_refresh_cookies(resp, refresh_token)
+
+            return resp, 200
         else:
             logging.warning(f"Failed login attempt for email: {email}.")
             return jsonify({"msg": "Invalid credentials. Please verify your email and password."}), 401
