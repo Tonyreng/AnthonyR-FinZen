@@ -8,6 +8,7 @@ type Props = {
     buttonVariant?: 'text' | 'outlined' | 'contained';
     ripple?: boolean;
     ButtonType?: 'submit' | 'button' | 'reset';
+    disabled?: boolean;
 };
 
 function FormButton({
@@ -18,6 +19,7 @@ function FormButton({
     buttonVariant,
     ripple = false,
     ButtonType = 'button',
+    disabled,
 }: Props) {
     return (
         <Button
@@ -26,6 +28,7 @@ function FormButton({
             type={ButtonType && ButtonType}
             size={buttonSize && buttonSize}
             {...(!ripple && { disableRipple: true })}
+            disabled={disabled}
         >
             {text}
         </Button>
