@@ -16,14 +16,15 @@ function Login(props: Props) {
     });
 
     const navigate = useNavigate();
-    const loginMutation = useLogin(navigate);
 
+    const { mutate, isPending } = useLogin({ navigate, methods });
     const onSubmit = (data: LoginFormInputs) => {
-        loginMutation.mutate(data);
-        methods.reset();
+        mutate(data);
     };
 
-    return <UserForm onSubmit={onSubmit} methods={methods} />;
+    return (
+        <UserForm onSubmit={onSubmit} methods={methods} isPending={isPending} />
+    );
 }
 
 export default Login;

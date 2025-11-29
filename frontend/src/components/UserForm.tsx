@@ -1,5 +1,5 @@
 import { FormProvider, UseFormReturn } from 'react-hook-form';
-import { LoginFormInputs } from '../pages/Login';
+import { LoginFormInputs } from '../types';
 import { Box } from '@mui/material';
 import FormInput from './FormInput';
 import FormHeader from './FormHeader';
@@ -8,9 +8,10 @@ import FormButton from './FormButton';
 type Props = {
     onSubmit: (data: LoginFormInputs) => void;
     methods: UseFormReturn<LoginFormInputs>;
+    isPending?: boolean;
 };
 
-const UserForm = ({ onSubmit, methods }: Props) => {
+const UserForm = ({ onSubmit, methods, isPending }: Props) => {
     return (
         <Box sx={{ width: { md: '500px' } }}>
             <FormHeader
@@ -39,9 +40,14 @@ const UserForm = ({ onSubmit, methods }: Props) => {
                     <FormInput
                         name="password"
                         label="Password"
-                        type="textfield"
+                        type="password"
                         rules={{
                             required: 'Password is required',
+                            minLength: {
+                                value: 4,
+                                message:
+                                    'Password must be at least 4 characters',
+                            },
                         }}
                     />
                     <Box
@@ -79,7 +85,8 @@ const UserForm = ({ onSubmit, methods }: Props) => {
                     </Box>
                     <Box>
                         <FormButton
-                            text="Log In"
+                            disabled={isPending}
+                            text={isPending ? 'Logging in...' : 'Log In'}
                             buttonStyle={{
                                 width: '100%',
                                 ':hover': {
