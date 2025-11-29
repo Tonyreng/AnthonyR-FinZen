@@ -19,12 +19,12 @@ const FormInput = ({ name, rules, label, type, styleInput }: Props) => {
             control={control}
             rules={rules && { ...rules }}
             render={({ field }) =>
-                type === 'textfield' ? (
+                type !== 'checkbox' ? (
                     <TextField
                         {...field}
                         label={label}
                         variant="outlined"
-                        type={name === 'password' ? 'password' : 'text'}
+                        type={type}
                         fullWidth
                         required
                         error={!!error}
