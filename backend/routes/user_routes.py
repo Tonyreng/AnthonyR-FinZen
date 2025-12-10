@@ -21,6 +21,8 @@ def login():
         data = request.get_json()
         email = data.get("email", "").strip().lower()
         password = data.get("password")
+        remember_me = data.get("rememberMe")
+        expires = timedelta(days=30) if remember_me else timedelta(hours=6)
 
         if not data or not email or not password:
             logging.warning(f"Login attempt with missing credentials.")
@@ -30,7 +32,7 @@ def login():
 
         if user and user.check_password(password):
             access_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15))
-            refresh_token = create_refresh_token(identity=user.id, expires_delta=timedelta(days=30))
+            refresh_token = create_refresh_token(identity=user.id, expires_delta=expires)
             logging.info(f"User logged in successfully: {email}")
 
             resp = jsonify({
