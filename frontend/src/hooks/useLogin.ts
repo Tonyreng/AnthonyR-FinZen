@@ -28,7 +28,7 @@ export const useLogin = ({ navigate, methods }: useLoginProps) => {
             navigate('/dashboard');
         },
         onError: error => {
-            console.error(error.message, error);
+            console.error(error.message, error || 'Login failed');
         },
     });
 };

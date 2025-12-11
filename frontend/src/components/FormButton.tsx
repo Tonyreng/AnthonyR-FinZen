@@ -24,9 +24,9 @@ function FormButton({
     return (
         <Button
             sx={buttonStyle && { ...buttonStyle }}
-            variant={buttonVariant && buttonVariant}
-            type={ButtonType && ButtonType}
-            size={buttonSize && buttonSize}
+            variant={buttonVariant}
+            type={ButtonType}
+            size={buttonSize}
             {...(!ripple && { disableRipple: true })}
             disabled={disabled}
         >

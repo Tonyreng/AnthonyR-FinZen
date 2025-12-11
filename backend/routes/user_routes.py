@@ -50,6 +50,3 @@ def login():
     except Exception as e:
         logging.error(f"Database error during login: {str(e)}")
         return jsonify({"msg": "Internal server error"}), 500
-        
-    
-    

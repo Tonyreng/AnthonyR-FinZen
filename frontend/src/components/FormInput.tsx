@@ -26,7 +26,6 @@ const FormInput = ({ name, rules, label, type, styleInput }: Props) => {
                         variant="outlined"
                         type={type}
                         fullWidth
-                        required
                         error={!!error}
                         helperText={error && error?.message}
                     />
