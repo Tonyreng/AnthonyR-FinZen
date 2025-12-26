@@ -22,19 +22,24 @@ api.interceptors.request.use(config => {
 
 api.interceptors.response.use(
     response => response,
+
     async error => {
         const originalRequest = error.config;
 
-        if (
+        const isExpired =
             error.response?.status === 401 &&
-            !originalRequest._retry &&
-            error.response.data?.message === 'Token has expired'
-        ) {
+            error.response.data?.msg === 'Token has expired';
+
+        if (isExpired && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                const { data } = await api.post('/api/refresh-token');
-                window.__ACCESS_TOKEN__ = data.accessToken;
-                originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+                const { data } = await axios.post(
+                    `${backendUrl}/api/user/refresh_token`,
+                    {},
+                    { withCredentials: true }
+                );
+                window.__ACCESS_TOKEN__ = data.access_token;
+                originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
                 return api(originalRequest);
             } catch (refreshError) {
                 console.error('Refresh token failed', refreshError);
