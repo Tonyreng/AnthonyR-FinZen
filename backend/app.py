@@ -90,7 +90,7 @@ setup_admin(app)
 register_routes(app)
 
 # Initialize rate limiter (after registering blueprints)
-from routes.user_routes import limiter
+from routes.login_route import limiter
 limiter.init_app(app)  
 
 # Basic route for testing
