@@ -3,6 +3,7 @@ import { LoginFormInputs, SmallUser } from '../types';
 import { api } from '../api/axiosInstance';
 import { UseFormReturn } from 'react-hook-form';
 import { NavigateFunction } from 'react-router-dom';
+import useGlobalReducer from './useGlobalReducer';
 
 type LoginResponse = {
     access_token: string;
@@ -16,6 +17,7 @@ type useLoginProps = {
 };
 
 export const useLogin = ({ navigate, methods }: useLoginProps) => {
+    const { dispatch } = useGlobalReducer();
     return useMutation({
         mutationFn: (data: LoginFormInputs) =>
             api
@@ -25,6 +27,7 @@ export const useLogin = ({ navigate, methods }: useLoginProps) => {
             methods.reset();
             console.log(data.msg, data);
             window.__ACCESS_TOKEN__ = data.access_token;
+            dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
             navigate('/dashboard');
         },
         onError: error => {
