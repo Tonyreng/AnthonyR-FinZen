@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from '@mui/material';
 
-const FullScreenLoader = () => {
+export const FullScreenLoader = () => {
     return (
         <Box
             sx={{
@@ -14,5 +14,3 @@ const FullScreenLoader = () => {
         </Box>
     );
 };
-
-export default FullScreenLoader;

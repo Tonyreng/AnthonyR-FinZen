@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer';
 import { initAuthServices } from '../services/auth.services';
 import { useEffect, useState } from 'react';
-import FullScreenLoader from './FullScreenLoader';
+import { FullScreenLoader } from './FullScreenLoader';
 
 type Props = {
     children?: React.ReactNode;
