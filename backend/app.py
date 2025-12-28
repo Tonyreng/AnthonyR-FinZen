@@ -76,6 +76,24 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # Activar en producción
 app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 jwt = JWTManager(app)
 
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        "msg": "Token has expired"
+    }), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({
+        "msg": "Invalid token"
+    }), 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify({
+        "msg": "Missing token"
+    }), 401
+
 # Enable CORS with credentials support
 CORS(app, 
      supports_credentials=True,
