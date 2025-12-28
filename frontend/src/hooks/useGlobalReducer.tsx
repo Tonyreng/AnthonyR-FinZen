@@ -5,7 +5,8 @@ import {
     ReactNode,
     Dispatch,
 } from 'react';
-import storeReducer, { actionType, initialStore, storeType } from '../store';
+import storeReducer, { initialStore } from '../store';
+import { storeType, actionType } from '../types';
 
 type StoreContextType = {
     store: storeType;
