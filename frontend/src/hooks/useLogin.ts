@@ -25,7 +25,6 @@ export const useLogin = ({ navigate, methods }: useLoginProps) => {
                 .then(response => response.data),
         onSuccess: data => {
             methods.reset();
-            console.log(data.msg, data);
             window.__ACCESS_TOKEN__ = data.access_token;
             dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
             navigate('/dashboard');
