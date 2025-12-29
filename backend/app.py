@@ -7,11 +7,14 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
+from routes import register_routes
 from database import db
 from models import *
 from admin import setup_admin
-from routes.auth import auth_bp
-from routes.users import users_bp
+import logging
+from logging.handlers import RotatingFileHandler
+import os
+
 
 # Load environment variables
 load_dotenv()
@@ -24,6 +27,34 @@ static_file_dir = os.path.join(os.path.dirname(
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
+
+# Crear carpeta de logs si no existe
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+
+# Configurar formato de log
+formatter = logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    "%Y-%m-%d %H:%M:%S"
+)
+
+# Archivo de log (rotativo para evitar que crezca demasiado)
+file_handler = RotatingFileHandler(
+    "logs/app.log", maxBytes=2_000_000, backupCount=5
+)
+file_handler.setFormatter(formatter)
+file_handler.setLevel(logging.INFO)
+
+# Log en consola (útil para Docker)
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+console_handler.setLevel(logging.INFO)
+
+# Agregar ambos handlers al logger principal de Flask
+app.logger.addHandler(file_handler)
+app.logger.addHandler(console_handler)
+app.logger.setLevel(logging.INFO)
+
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
@@ -34,22 +65,51 @@ else:
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# JWT Configuration
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')
-jwt = JWTManager(app)
-
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
-# Enable CORS
-CORS(app)
+# JWT Configuration
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')
+app.config['JWT_TOKEN_LOCATION'] = ['cookies', 'headers']
+app.config['JWT_COOKIE_SECURE'] = False  # True en producción con HTTPS
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # Activar en producción
+app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
+jwt = JWTManager(app)
+
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return jsonify({
+        "msg": "Token has expired"
+    }), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return jsonify({
+        "msg": "Invalid token"
+    }), 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    return jsonify({
+        "msg": "Missing token"
+    }), 401
+
+# Enable CORS with credentials support
+CORS(app, 
+     supports_credentials=True,
+     origins=['http://localhost:3000', 'http://localhost:5173'],
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 # Setup admin
 setup_admin(app)
 
 # Register Blueprints
-app.register_blueprint(auth_bp, url_prefix='/api/auth')
-app.register_blueprint(users_bp, url_prefix='/api/users')
+register_routes(app)
+
+# Initialize rate limiter (after registering blueprints)
+from routes.login_route import limiter
+limiter.init_app(app)  
 
 # Basic route for testing
 @app.route('/api/health')
