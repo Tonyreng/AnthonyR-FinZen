@@ -13,7 +13,13 @@ type Props = {
 
 const UserForm = ({ onSubmit, methods, isPending }: Props) => {
     return (
-        <Box sx={{ width: { md: '500px' } }}>
+        <Box
+            sx={{
+                margin: 'auto',
+                width: { md: '500px' },
+                textAlign: 'center',
+            }}
+        >
             <FormHeader
                 title="Log in to your account"
                 paragraph="Welcome back! Please enter your details."

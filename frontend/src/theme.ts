@@ -4,13 +4,13 @@ export const theme = createTheme({
     palette: {
         mode: 'dark',
         primary: {
-            main: 'rgb(17, 115, 212)', // azul principal
-            light: '#2563EB ', // hover
+            main: '#1173d4', // azul principal
+            light: '#1173d4cc', // hover
             dark: '#1E3A8A', // variantes más oscuras
             contrastText: '#FFFFFF',
         },
         background: {
-            default: 'rgb(16, 25, 34)', // fondo general
+            default: '#101922', // fondo general
             paper: '#111827', // cards, modals, inputs
         },
         text: {
