@@ -97,7 +97,7 @@ def missing_token_callback(error):
 # Enable CORS with credentials support
 CORS(app, 
      supports_credentials=True,
-     origins=['http://localhost:3000'],
+     origins=['http://localhost:3000', 'http://localhost:5173'],
      allow_headers=['Content-Type', 'Authorization'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
