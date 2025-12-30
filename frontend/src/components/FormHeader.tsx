@@ -3,11 +3,12 @@ import { Box, Typography } from '@mui/material';
 type Props = {
     title: string;
     paragraph: string;
+    styles?: object;
 };
 
-function FormHeader({ title, paragraph }: Props) {
+function FormHeader({ title, paragraph, styles }: Props) {
     return (
-        <Box sx={{ mb: 3 }}>
+        <Box sx={styles}>
             <Typography sx={{ mb: 1 }} variant="h2">
                 {title}
             </Typography>
