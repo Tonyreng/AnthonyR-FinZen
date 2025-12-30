@@ -23,6 +23,7 @@ const UserForm = ({ onSubmit, methods, isPending }: Props) => {
             <FormHeader
                 title="Log in to your account"
                 paragraph="Welcome back! Please enter your details."
+                styles={{ mb: 3 }}
             />
             <FormProvider {...methods}>
                 <Box
