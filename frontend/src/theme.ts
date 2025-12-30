@@ -20,7 +20,8 @@ export const theme = createTheme({
         divider: '#1F2937',
     },
     typography: {
-        fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        fontFamily:
+            '"Manrope" ,"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
         h1: { fontWeight: 700, fontSize: '2.5rem' },
         h2: { fontWeight: 600, fontSize: '2rem' },
         body1: { color: '#ffffffff' },
