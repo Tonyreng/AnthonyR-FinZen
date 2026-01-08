@@ -178,6 +178,22 @@ class Transaction(db.Model):
             raise ValueError("A 'general' type transaction cannot be linked to debt, loan_given, or subscription.")
         
         return value
+    
+    @validates("type", "category_id")
+    def validate_type_vs_category(self, key, value):
+        transaction_type = value if key == "type" else getattr(self, "type", None)
+        category = self.category if key != "category_id" else None
+
+        if category and transaction_type:
+            if transaction_type == TransactionType.subscription and category.type != CategoryType.expense:
+                raise ValueError("Subscription transactions must belong to an expense category.")
+
+            if transaction_type == TransactionType.debt_payment and category.type != CategoryType.expense:
+                raise ValueError("Debt payment transactions must belong to an expense category.")
+            
+            if transaction_type == TransactionType.loan_payment and category.type != CategoryType.income:
+                raise ValueError("Loan payment transactions must belong to an income category.")
+        return value
         
     def serialize(self , large=False):
         if not large:
