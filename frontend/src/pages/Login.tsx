@@ -5,9 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 import { Box } from '@mui/material';
 
-type Props = {};
-
-function Login(props: Props) {
+function Login() {
     const methods = useForm<LoginFormInputs>({
         defaultValues: {
             email: '',
