@@ -2,9 +2,10 @@ import { Box, Card, Typography } from '@mui/material';
 
 type Props = {
     styles?: object;
+    totalBalance?: string;
 };
 
-export const CardBalance = ({ styles }: Props) => {
+export const CardBalance = ({ styles, totalBalance }: Props) => {
     return (
         <Box sx={styles}>
             <Card
@@ -24,7 +25,13 @@ export const CardBalance = ({ styles }: Props) => {
                         Total Balance
                     </Typography>
                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                        $12,345.67
+                        $
+                        {totalBalance
+                            ? parseFloat(totalBalance).toLocaleString('en-CO', {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                              })
+                            : '0,00'}
                     </Typography>
                 </Box>
             </Card>
