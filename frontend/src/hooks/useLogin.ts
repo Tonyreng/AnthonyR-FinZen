@@ -1,15 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { LoginFormInputs, SmallUser } from '../types';
+import { LoginFormInputs, LoginResponse } from '../types';
 import { api } from '../api/axiosInstance';
 import { UseFormReturn } from 'react-hook-form';
 import { NavigateFunction } from 'react-router-dom';
 import useGlobalReducer from './useGlobalReducer';
-
-type LoginResponse = {
-    access_token: string;
-    user: SmallUser;
-    msg: string;
-};
 
 type useLoginProps = {
     navigate: NavigateFunction;
