@@ -23,3 +23,23 @@ export type actionType =
     | { type: 'LOGIN_SUCCESS'; payload: SmallUser }
     | { type: 'LOGOUT' }
     | { type: 'AUTH_INITIALIZED' };
+
+export type LoginResponse = {
+    access_token: string;
+    user: SmallUser;
+    msg: string;
+};
+
+export type UpcomingPaymentsTypes = {
+    id: number;
+    name: string;
+    price: string;
+    paymentDate: string;
+};
+
+export type DashboardResponse = {
+    total_balance: string;
+    income_month: string;
+    expense_month: string;
+    upcoming_payments: UpcomingPaymentsTypes[];
+};
