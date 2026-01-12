@@ -11,8 +11,8 @@ dashboard_bp = Blueprint("dashboard_bp", __name__)
 @dashboard_bp.route("/user/dashboard", methods=["GET"])
 @jwt_required()
 def get_dashboard_summary():
-    try
-        user_id = get_jwt_identity()
+    try:
+        user_id = int(get_jwt_identity())
         
         now = datetime.now(timezone.utc)
         start_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
