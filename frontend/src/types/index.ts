@@ -37,9 +37,16 @@ export type UpcomingPaymentsTypes = {
     paymentDate: string;
 };
 
+export type TrendChartTypes = {
+    month: string;
+    total: string;
+};
+
 export type DashboardResponse = {
     total_balance: string;
     income_month: string;
+    income_trend: TrendChartTypes[];
     expense_month: string;
+    expense_trend: TrendChartTypes[];
     upcoming_payments: UpcomingPaymentsTypes[];
 };
