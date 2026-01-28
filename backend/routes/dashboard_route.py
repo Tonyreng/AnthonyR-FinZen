@@ -36,6 +36,34 @@ def get_dashboard_summary():
             .scalar()
         )
 
+        
+        start_date = (now.replace(day=1) - timedelta(days=150)).replace(day=1)
+
+
+        income_trend = (
+            db.session.query(
+                func.date_trunc('month', Transaction.date).label('month'),
+                func.coalesce(func.sum(Transaction.amount), 0).label('total')
+            )
+            .join(Category, Transaction.category_id == Category.id)
+            .filter(
+                Transaction.user_id == user_id,
+                Category.type == CategoryType.income,
+                Transaction.date >= start_date
+            )
+            .group_by('month')
+            .order_by('month')
+            .all()
+        )
+
+        income_trend_data = [
+            {
+                "month": row.month.strftime("%b"),
+                "total": str(row.total)
+            }
+            for row in income_trend
+        ]
+
         expense_month = (
             db.session.query(func.coalesce(func.sum(Transaction.amount), 0))
             .join(Category)
@@ -47,6 +75,30 @@ def get_dashboard_summary():
             )
             .scalar()
         )
+
+        expense_trend = (
+            db.session.query(
+                func.date_trunc('month', Transaction.date).label('month'),
+                func.coalesce(func.sum(Transaction.amount), 0).label('total')
+            )
+            .join(Category, Transaction.category_id == Category.id)
+            .filter(
+                Transaction.user_id == user_id,
+                Category.type == CategoryType.expense,
+                Transaction.date >= start_date
+            )
+            .group_by('month')
+            .order_by('month')
+            .all()
+        )
+
+        expense_trend_data = [
+            {
+                "month": row.month.strftime("%b"),
+                "total": str(row.total)
+            }
+            for row in expense_trend
+        ]
 
         upcoming_limit = now + timedelta(days=30)
 
@@ -61,21 +113,26 @@ def get_dashboard_summary():
             .limit(5)
             .all()
         )
+
+        upcoming_subscriptions_data = [
+            {
+                "id": sub.id,
+                "name": sub.name,
+                "price": str(sub.price),
+                "payment_date": sub.payment_date.isoformat()
+            }
+            for sub in upcoming_subscriptions
+        ]
+
         logging.info(f"Dashboard summary fetched for user : {user_id}")
 
         return jsonify({
             "total_balance": str(total_balance),
             "income_month": str(income_month),
+            "income_trend": income_trend_data,
             "expense_month": str(expense_month),
-            "upcoming_payments": [
-                {
-                    "id": sub.id,
-                    "name": sub.name,
-                    "price": str(sub.price),
-                    "payment_date": sub.payment_date.isoformat()
-                }
-                for sub in upcoming_subscriptions
-            ]
+            "expense_trend": expense_trend_data,
+            "upcoming_payments": upcoming_subscriptions_data
         }), 200
     except Exception as e:
         logging.error(f"Error fetching dashboard summary: {str(e)}")
