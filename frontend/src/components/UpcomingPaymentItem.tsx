@@ -2,12 +2,18 @@ import { Box, Typography, Avatar } from '@mui/material';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
+import YouTubeIcon from '@mui/icons-material/YouTube';
 import { JSX } from 'react';
 
 const iconMap: Record<string, JSX.Element> = {
     calendar: <CalendarMonthIcon />,
     gym: <FitnessCenterIcon />,
     card: <CreditCardIcon />,
+    music: <LibraryMusicIcon />,
+    video: <OndemandVideoIcon />,
+    youtube: <YouTubeIcon />,
 };
 
 type UpcomingPaymentItemProps = {
@@ -33,6 +39,7 @@ export const UpcomingPaymentItem = ({
                         width: 40,
                         height: 40,
                     }}
+                    variant="rounded"
                 >
                     {iconMap[icon]}
                 </Avatar>
