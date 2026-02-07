@@ -1,5 +1,4 @@
 import { Box, Card, CardContent, Typography } from '@mui/material';
-import { TrendGraph } from './TrendGraph';
 
 type Props = {
     title?: string;
