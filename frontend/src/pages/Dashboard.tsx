@@ -32,7 +32,10 @@ export const Dashboard = () => {
                     mt: 3,
                     display: 'grid',
                     gap: 2,
-                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gridTemplateColumns: {
+                        md: 'repeat(3, 1fr)',
+                        xs: 'repeat(1, 1fr)',
+                    },
                 }}
             >
                 <SummaryCard title="Spending" subHeader={data?.expense_month}>
