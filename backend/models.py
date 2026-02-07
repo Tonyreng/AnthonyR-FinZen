@@ -1,5 +1,5 @@
 
-from sqlalchemy import Index
+from sqlalchemy import Index, event
 from datetime import datetime, timezone
 from decimal import Decimal
 import enum
@@ -156,10 +156,8 @@ class Transaction(db.Model):
     loan_given = db.relationship("LoanGiven", back_populates="transactions")
     installment_links: Mapped[list["InstallmentTransaction"]] = db.relationship("InstallmentTransaction", back_populates="transaction")
 
-    @validates("type", "category_id", "debt_id", "loan_given_id", "subscription_id")
-    def validate_transaction(self, key, value):
-        setattr(self, key, value)
-
+    def _validate_transaction_constraints(self):
+        """Validate transaction constraints after all fields are set"""
         assigned = [
             bool(self.debt_id),
             bool(self.loan_given_id),
@@ -198,8 +196,6 @@ class Transaction(db.Model):
 
                     if self.type == TransactionType.loan_payment and category.type != CategoryType.income:
                         raise ValueError("Loan payments must belong to an income category.")
-
-        return value
 
         
     def serialize(self , large=False):
@@ -244,6 +240,15 @@ class Transaction(db.Model):
                     "status": self.loan_given.status.value
                 } if self.loan_given else None,
             }
+
+# Event listener to validate Transaction before insert/update
+@event.listens_for(Transaction, 'before_insert')
+@event.listens_for(Transaction, 'before_update')
+def validate_transaction_before_save(mapper, connection, target):
+    """Validate transaction constraints before saving"""
+    # Skip validation if type is not set yet
+    if target.type:
+        target._validate_transaction_constraints()
     
 class Category(db.Model):
 
