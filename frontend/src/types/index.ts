@@ -34,7 +34,7 @@ export type UpcomingPaymentsTypes = {
     id: number;
     name: string;
     price: string;
-    paymentDate: string;
+    payment_date: string;
 };
 
 export type TrendChartTypes = {
