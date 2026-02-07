@@ -1,6 +1,8 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+from flask_jwt_extended import jwt_required as jwt_req, get_jwt_identity as get_jwt_id
+from routes.login_route import limiter
 import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
@@ -79,12 +81,14 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # Activar en producción
 app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 jwt = JWTManager(app)
 
+
 @jwt.expired_token_loader
 def expired_token_callback(jwt_header, jwt_payload):
     app.logger.warning(f"Token expired for payload: {jwt_payload}")
     return jsonify({
         "msg": "Token has expired"
     }), 401
+
 
 @jwt.invalid_token_loader
 def invalid_token_callback(error):
@@ -93,6 +97,7 @@ def invalid_token_callback(error):
         "msg": "Invalid token"
     }), 401
 
+
 @jwt.unauthorized_loader
 def missing_token_callback(error):
     app.logger.warning(f"Missing/unauthorized token error: {error}")
@@ -100,8 +105,9 @@ def missing_token_callback(error):
         "msg": "Missing token"
     }), 401
 
+
 # Enable CORS with credentials support
-CORS(app, 
+CORS(app,
      supports_credentials=True,
      origins=['http://localhost:3000', 'http://localhost:5173'],
      allow_headers=['Content-Type', 'Authorization'],
@@ -117,15 +123,18 @@ setup_commands(app)
 register_routes(app)
 
 # Initialize rate limiter (after registering blueprints)
-from routes.login_route import limiter
-limiter.init_app(app)  
+limiter.init_app(app)
 
 # Basic route for testing
+
+
 @app.route('/api/health')
 def health():
     return jsonify({"status": "ok", "message": "Backend is running"})
 
 # Debug endpoint for JWT testing
+
+
 @app.route('/api/debug/token')
 def debug_token():
     auth_header = request.headers.get('Authorization', 'NONE')
@@ -134,7 +143,7 @@ def debug_token():
         "all_headers": dict(request.headers)
     })
 
-from flask_jwt_extended import jwt_required as jwt_req, get_jwt_identity as get_jwt_id
+
 @app.route('/api/debug/protected')
 @jwt_req()
 def debug_protected():
@@ -142,6 +151,8 @@ def debug_protected():
     return jsonify({"user_id": user_id, "msg": "JWT is valid!"})
 
 # generate sitemap with all your endpoints
+
+
 @app.route('/')
 def sitemap():
     if ENV == "development":
@@ -149,6 +160,8 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
+
+
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):
@@ -160,5 +173,5 @@ def serve_any_other_file(path):
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 5000))
+    PORT = int(os.environ.get('PORT', 5001))
     app.run(host='127.0.0.1', port=PORT, debug=False)

@@ -2,14 +2,14 @@ import axios, {
     InternalAxiosRequestConfig,
     AxiosResponse,
     AxiosError,
-} from "axios";
+} from 'axios';
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = 'http://localhost:5001/api';
 
 // Configurar interceptor para incluir token en todas las peticiones
 axios.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -26,8 +26,8 @@ axios.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response?.status === 401) {
             // Token expirado o inválido
-            localStorage.removeItem("token");
-            window.location.href = "/login";
+            localStorage.removeItem('token');
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }
@@ -59,7 +59,7 @@ export const authService = {
     },
 
     logout: (): void => {
-        localStorage.removeItem("token");
+        localStorage.removeItem('token');
     },
 };
 
