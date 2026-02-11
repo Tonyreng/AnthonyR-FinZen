@@ -42,6 +42,13 @@ export type TrendChartTypes = {
     total: string;
 };
 
+export type AiRecommendations = {
+    health_score: number;
+    status: string;
+    alerts: string[];
+    recommendations: string[];
+};
+
 export type DashboardResponse = {
     total_balance: string;
     income_month: string;
@@ -49,4 +56,5 @@ export type DashboardResponse = {
     expense_month: string;
     expense_trend: TrendChartTypes[];
     upcoming_payments: UpcomingPaymentsTypes[];
+    ai_recommendations: AiRecommendations;
 };
