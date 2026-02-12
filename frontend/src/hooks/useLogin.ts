@@ -1,15 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { LoginFormInputs, SmallUser } from '../types';
+import { LoginFormInputs, LoginResponse } from '../types';
 import { api } from '../api/axiosInstance';
 import { UseFormReturn } from 'react-hook-form';
 import { NavigateFunction } from 'react-router-dom';
 import useGlobalReducer from './useGlobalReducer';
-
-type LoginResponse = {
-    access_token: string;
-    user: SmallUser;
-    msg: string;
-};
 
 type useLoginProps = {
     navigate: NavigateFunction;
@@ -25,7 +19,6 @@ export const useLogin = ({ navigate, methods }: useLoginProps) => {
                 .then(response => response.data),
         onSuccess: data => {
             methods.reset();
-            console.log(data.msg, data);
             window.__ACCESS_TOKEN__ = data.access_token;
             dispatch({ type: 'LOGIN_SUCCESS', payload: data.user });
             navigate('/dashboard');

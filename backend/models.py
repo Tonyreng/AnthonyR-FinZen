@@ -1,10 +1,11 @@
 
+from sqlalchemy import Index, event
 from datetime import datetime, timezone
 from decimal import Decimal
 import enum
 from typing import Any
 from sqlalchemy import JSON, CheckConstraint, ForeignKey, Numeric, String, Boolean, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy.orm import Mapped, mapped_column, validates, object_session
 from database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -107,7 +108,7 @@ class Account(db.Model):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False, index=True)
 
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     balance: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False, default=0.00)
@@ -128,6 +129,11 @@ class Account(db.Model):
         } 
     
 class Transaction(db.Model):
+
+    __table_args__ = (
+        Index("idx_transaction_user_date", "user_id", "date"),
+    )
+
     id: Mapped[int] = mapped_column(primary_key=True)
     account_id: Mapped[int] = mapped_column(ForeignKey("account.id"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False, index=True)
@@ -150,34 +156,47 @@ class Transaction(db.Model):
     loan_given = db.relationship("LoanGiven", back_populates="transactions")
     installment_links: Mapped[list["InstallmentTransaction"]] = db.relationship("InstallmentTransaction", back_populates="transaction")
 
-    @validates('debt_id', 'loan_given_id', 'subscription_id', 'type')
-    def validate_ownership(self, key, value):
-        debt_id = value if key == 'debt_id' else getattr(self, 'debt_id', None)
-        loan_given_id = value if key == 'loan_given_id' else getattr(self, 'loan_given_id', None)
-        subscription_id = value if key == 'subscription_id' else getattr(self, 'subscription_id', None)
-        transaction_type = value if key == 'type' else getattr(self, 'type', None)
-
-        assigned = [bool(debt_id), bool(loan_given_id), bool(subscription_id)]
+    def _validate_transaction_constraints(self):
+        """Validate transaction constraints after all fields are set"""
+        assigned = [
+            bool(self.debt_id),
+            bool(self.loan_given_id),
+            bool(self.subscription_id)
+        ]
 
         if sum(assigned) > 1:
-            raise ValueError("Transaction cannot be linked to more than one entity (Debt, LoanGiven, or Subscription).")
-        
-        if sum(assigned) == 0 and transaction_type != TransactionType.general:
-            raise ValueError("This transaction type must be linked to a related entity.")
+            raise ValueError("Transaction cannot be linked to more than one entity.")
 
-        if transaction_type == TransactionType.debt_payment and not debt_id:
-            raise ValueError("A 'debt_payment' type transaction must be linked to a Debt (debt_id).")
-        
-        if transaction_type == TransactionType.loan_payment and not loan_given_id:
-            raise ValueError("A 'loan_payment' type transaction must be linked to a LoanGiven (loan_given_id).")
-        
-        if transaction_type == TransactionType.subscription and not subscription_id:
-            raise ValueError("A 'subscription' type transaction must be linked to a Subscription (subscription_id).")
-        
-        if transaction_type == TransactionType.general and any([debt_id, loan_given_id, subscription_id]):
-            raise ValueError("A 'general' type transaction cannot be linked to debt, loan_given, or subscription.")
-        
-        return value
+        if self.type:
+            if sum(assigned) == 0 and self.type != TransactionType.general:
+                raise ValueError("This transaction type must be linked to a related entity.")
+
+            if self.type == TransactionType.debt_payment and not self.debt_id:
+                raise ValueError("Debt payment must be linked to a debt.")
+
+            if self.type == TransactionType.loan_payment and not self.loan_given_id:
+                raise ValueError("Loan payment must be linked to a loan.")
+
+            if self.type == TransactionType.subscription and not self.subscription_id:
+                raise ValueError("Subscription transaction must be linked to a subscription.")
+
+            if self.type == TransactionType.general and sum(assigned) > 0:
+                raise ValueError("General transaction cannot be linked to entities.")
+
+        if self.category_id and self.type:
+            session = object_session(self)
+            if session:
+                category = session.get(Category, self.category_id)
+                if category:
+                    if self.type in (
+                        TransactionType.subscription,
+                        TransactionType.debt_payment
+                    ) and category.type != CategoryType.expense:
+                        raise ValueError("This transaction must belong to an expense category.")
+
+                    if self.type == TransactionType.loan_payment and category.type != CategoryType.income:
+                        raise ValueError("Loan payments must belong to an income category.")
+
         
     def serialize(self , large=False):
         if not large:
@@ -221,6 +240,15 @@ class Transaction(db.Model):
                     "status": self.loan_given.status.value
                 } if self.loan_given else None,
             }
+
+# Event listener to validate Transaction before insert/update
+@event.listens_for(Transaction, 'before_insert')
+@event.listens_for(Transaction, 'before_update')
+def validate_transaction_before_save(mapper, connection, target):
+    """Validate transaction constraints before saving"""
+    # Skip validation if type is not set yet
+    if target.type:
+        target._validate_transaction_constraints()
     
 class Category(db.Model):
 
@@ -255,6 +283,11 @@ class Category(db.Model):
             }
 
 class Subscription(db.Model):
+
+    __table_args__ = (
+        Index("idx_subscription_user_active_date", "user_id", "is_active", "payment_date"),
+    )
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
 

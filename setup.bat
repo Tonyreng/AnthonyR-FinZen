@@ -36,8 +36,8 @@ echo 🎉 ¡Setup completado!
 echo.
 echo 📍 URLs disponibles:
 echo    Frontend: http://localhost:3000
-echo    Backend:  http://localhost:5000/api/health
-echo    Admin:    http://localhost:5000/admin/
+echo    Backend:  http://localhost:5001/api/health
+echo    Admin:    http://localhost:5001/admin/
 echo.
 echo 👤 Usuario de prueba:
 echo    Email:    admin@example.com

@@ -3,10 +3,9 @@ import UserForm from '../components/UserForm';
 import { LoginFormInputs } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
+import { Box } from '@mui/material';
 
-type Props = {};
-
-function Login(props: Props) {
+function Login() {
     const methods = useForm<LoginFormInputs>({
         defaultValues: {
             email: '',
@@ -23,7 +22,20 @@ function Login(props: Props) {
     };
 
     return (
-        <UserForm onSubmit={onSubmit} methods={methods} isPending={isPending} />
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+            }}
+        >
+            <UserForm
+                onSubmit={onSubmit}
+                methods={methods}
+                isPending={isPending}
+            />
+        </Box>
     );
 }
 

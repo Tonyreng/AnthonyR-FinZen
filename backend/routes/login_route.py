@@ -31,8 +31,8 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
-            access_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15))
-            refresh_token = create_refresh_token(identity=user.id, expires_delta=expires)
+            access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(minutes=15))
+            refresh_token = create_refresh_token(identity=str(user.id), expires_delta=expires)
             logging.info(f"User logged in successfully: {email}")
 
             resp = jsonify({
