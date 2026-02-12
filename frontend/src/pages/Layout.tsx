@@ -14,7 +14,11 @@ export const Layout = ({ children }: Props) => {
 
     useEffect(() => {
         const bootstrapAsync = async () => {
-            await initAuthServices();
+            const user = await initAuthServices();
+
+            if (user) {
+                dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+            }
 
             dispatch({ type: 'AUTH_INITIALIZED' });
 

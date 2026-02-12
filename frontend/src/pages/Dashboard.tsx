@@ -9,7 +9,6 @@ import { AiRecommendationsCard } from '../components/AiRecommendationsCard';
 
 export const Dashboard = () => {
     const { data, error, isLoading } = useDashboard();
-    console.log(data);
 
     return (
         <>

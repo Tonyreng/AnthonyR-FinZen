@@ -6,11 +6,10 @@ export type LoginFormInputs = {
 
 export type SmallUser = {
     id: number;
-    fullName: string;
+    full_name: string;
     email: string;
     currency: string;
-    creaetedAt: string;
-    updatedAt: string;
+    created_at: string;
 };
 
 export type storeType = {
