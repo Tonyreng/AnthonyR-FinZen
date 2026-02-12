@@ -5,10 +5,12 @@ import { Box } from '@mui/material';
 import { SummaryCard } from '../components/SummaryCard';
 import { TrendGraph } from '../components/TrendGraph';
 import { UpcomingPaymentsCard } from '../components/UpcomingPaymentsCard';
+import { AiRecommendationsCard } from '../components/AiRecommendationsCard';
 
 export const Dashboard = () => {
     const { data, error, isLoading } = useDashboard();
     console.log(data);
+
     return (
         <>
             <FormHeader
@@ -46,6 +48,21 @@ export const Dashboard = () => {
                 </SummaryCard>
                 <SummaryCard title="Upcoming Payments">
                     <UpcomingPaymentsCard payments={data?.upcoming_payments} />
+                </SummaryCard>
+            </Box>
+            <Box
+                sx={{
+                    px: 3,
+                    mt: 3,
+                }}
+            >
+                <SummaryCard title="Recommendations">
+                    <AiRecommendationsCard
+                        alerts={data?.ai_recommendations?.alerts}
+                        recommendations={
+                            data?.ai_recommendations?.recommendations
+                        }
+                    />
                 </SummaryCard>
             </Box>
         </>
