@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import func, select
 from database import db
+import locale
 
 dashboard_bp = Blueprint("dashboard_bp", __name__)
 
@@ -242,6 +243,11 @@ def get_dashboard_summary():
         score = 0
         alerts = []
         recommendations = []
+        net_now_formatted = f"{net_now:,.2f}"
+        net_now_formatted = (
+            net_now_formatted.replace(",", "X").replace(
+                ".", ",").replace("X", ".")
+        )
 
         if porc_exp_now > porc_exp_prev_month_part:
             if porc_exp_prev_month_full > porc_exp_prev_month_full2:
@@ -253,7 +259,7 @@ def get_dashboard_summary():
                 alerts.append(
                     "This month, percentage-wise, you are spending more money than last month.")
         alerts.append(
-            f"You are managing your money well month after month, your net balance is {round(net_now, 2)}")
+            f"You are managing your money well month after month, your net balance is {net_now_formatted}")
         recommendations.append(
             "Keep tracking your expenses and try to maintain or increase your net balance.")
 
