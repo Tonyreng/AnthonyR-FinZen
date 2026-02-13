@@ -16,3 +16,11 @@ export const initAuthServices = async (): Promise<SmallUser | null> => {
         return null;
     }
 };
+
+export const logoutService = async (): Promise<void> => {
+    try {
+        await api.post('api/user/logout');
+    } catch {
+        console.error('Failed to logout from server session');
+    }
+};
