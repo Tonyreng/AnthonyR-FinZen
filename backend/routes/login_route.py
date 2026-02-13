@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, create_refresh_token, set_refresh_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, set_refresh_cookies, unset_jwt_cookies
 from models import User
 import logging
 from datetime import timedelta
@@ -31,8 +31,10 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user and user.check_password(password):
-            access_token = create_access_token(identity=str(user.id), expires_delta=timedelta(minutes=15))
-            refresh_token = create_refresh_token(identity=str(user.id), expires_delta=expires)
+            access_token = create_access_token(identity=str(
+                user.id), expires_delta=timedelta(minutes=15))
+            refresh_token = create_refresh_token(
+                identity=str(user.id), expires_delta=expires)
             logging.info(f"User logged in successfully: {email}")
 
             resp = jsonify({
@@ -49,4 +51,16 @@ def login():
             return jsonify({"msg": "Invalid credentials. Please verify your email and password."}), 401
     except Exception as e:
         logging.error(f"Database error during login: {str(e)}")
+        return jsonify({"msg": "Internal server error"}), 500
+
+
+@login_bp.route("/user/logout", methods=["POST"])
+def logout():
+    try:
+        logging.info("User logged out successfully.")
+        resp = jsonify({"msg": "Logout successful"})
+        unset_jwt_cookies(resp)
+        return resp, 200
+    except Exception as e:
+        logging.error(f"Error during logout: {str(e)}")
         return jsonify({"msg": "Internal server error"}), 500

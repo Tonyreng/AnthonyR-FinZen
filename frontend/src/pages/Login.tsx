@@ -27,7 +27,8 @@ function Login() {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                height: '100vh',
+                minHeight: 'calc(100vh - 64px)',
+                px: 2,
             }}
         >
             <UserForm

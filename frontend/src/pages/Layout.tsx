@@ -3,6 +3,7 @@ import useGlobalReducer from '../hooks/useGlobalReducer';
 import { initAuthServices } from '../services/auth.services';
 import { useEffect, useState } from 'react';
 import { FullScreenLoader } from './FullScreenLoader';
+import { Navbar } from '../components/Navbar';
 
 type Props = {
     children?: React.ReactNode;
@@ -14,7 +15,11 @@ export const Layout = ({ children }: Props) => {
 
     useEffect(() => {
         const bootstrapAsync = async () => {
-            await initAuthServices();
+            const user = await initAuthServices();
+
+            if (user) {
+                dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+            }
 
             dispatch({ type: 'AUTH_INITIALIZED' });
 
@@ -29,6 +34,7 @@ export const Layout = ({ children }: Props) => {
 
     return (
         <div className="d-flex flex-column min-vh-100">
+            <Navbar />
             <Outlet />
         </div>
     );
