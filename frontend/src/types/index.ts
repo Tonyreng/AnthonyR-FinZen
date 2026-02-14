@@ -80,9 +80,3 @@ export type AccountItem = {
 export type AccountsResponse = {
     accounts: AccountItem[];
 };
-
-export type CreateAccountPayload = {
-    name: string;
-    type: AccountTypeValue;
-    balance: number;
-};

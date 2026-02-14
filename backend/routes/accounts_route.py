@@ -40,7 +40,7 @@ def create_account():
 
         name = str(data.get("name", "")).strip()
         type_value = str(data.get("type", "")).strip().lower()
-        balance_raw = data.get("balance", 0)
+        balance_raw = data.get("balance", "0")
 
         if not name:
             return jsonify({"msg": "Account name is required"}), 400
@@ -51,7 +51,7 @@ def create_account():
             return jsonify({"msg": "Invalid account type"}), 400
 
         try:
-            balance = Decimal(str(balance_raw))
+            balance = Decimal(balance_raw)
         except (InvalidOperation, TypeError, ValueError):
             return jsonify({"msg": "Invalid balance value"}), 400
 
