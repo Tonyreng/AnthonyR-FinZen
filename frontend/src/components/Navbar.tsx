@@ -18,10 +18,10 @@ import { logoutService } from '../services/auth.services';
 
 const protectedNavItems = [
     { label: 'Overview', to: '/dashboard' },
-    { label: 'Accounts', to: '/dashboard' },
-    { label: 'Subscriptions', to: '/dashboard' },
-    { label: 'Debts', to: '/dashboard' },
-    { label: 'Reports', to: '/dashboard' },
+    { label: 'Accounts', to: '/accounts' },
+    { label: 'Subscriptions', to: '/' },
+    { label: 'Debts', to: '/' },
+    { label: 'Reports', to: '/' },
 ];
 
 export const Navbar = () => {
@@ -68,6 +68,10 @@ export const Navbar = () => {
     };
 
     const userInitial = store.user?.full_name?.charAt(0)?.toUpperCase() ?? 'U';
+
+    const isActiveNavItem = (to: string) => {
+        return location.pathname === to;
+    };
 
     return (
         <AppBar
@@ -133,16 +137,14 @@ export const Navbar = () => {
                                         fontWeight: 500,
                                         px: 1.5,
                                         minWidth: 'auto',
-                                        backgroundColor:
-                                            item.label === 'Overview' &&
-                                            location.pathname === '/dashboard'
-                                                ? 'rgba(17, 115, 212, 0.25)'
-                                                : 'transparent',
-                                        color:
-                                            item.label === 'Overview' &&
-                                            location.pathname === '/dashboard'
-                                                ? 'primary.main'
-                                                : 'text.secondary',
+                                        backgroundColor: isActiveNavItem(
+                                            item.to
+                                        )
+                                            ? 'rgba(17, 115, 212, 0.25)'
+                                            : 'transparent',
+                                        color: isActiveNavItem(item.to)
+                                            ? 'primary.main'
+                                            : 'text.secondary',
                                         '&:hover': {
                                             backgroundColor:
                                                 'rgba(17, 115, 212, 0.12)',
