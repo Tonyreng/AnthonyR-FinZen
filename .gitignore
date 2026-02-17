@@ -231,3 +231,6 @@ jspm_packages/
 .agents/skills/vercel-react-best-practices/rules/server-dedup-props.md
 .agents/skills/vercel-react-best-practices/rules/server-parallel-fetching.md
 .agents/skills/vercel-react-best-practices/rules/server-serialization.md
+.agents/skills/web-design-guidelines/SKILL.md
+.gitignore
+.claude/skills/web-design-guidelines
