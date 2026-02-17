@@ -51,7 +51,7 @@ def create_account():
             return jsonify({"msg": "Invalid account type"}), 400
 
         try:
-            balance = Decimal(balance_raw)
+            balance = Decimal(str(balance_raw))
         except (InvalidOperation, TypeError, ValueError):
             return jsonify({"msg": "Invalid balance value"}), 400
 
