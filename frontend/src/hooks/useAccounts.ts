@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/axiosInstance';
 import { AccountsResponse, AccountItem } from '../types';
+import { UseFormReturn } from 'react-hook-form';
+
+type useAccountsProps = {
+    methods: UseFormReturn<AccountItem>;
+};
 
 export const useAccounts = () => {
     return useQuery({
@@ -12,7 +17,7 @@ export const useAccounts = () => {
     });
 };
 
-export const useCreateAccount = () => {
+export const useCreateAccount = ({ methods }: useAccountsProps) => {
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -24,6 +29,7 @@ export const useCreateAccount = () => {
                 }>('/api/user/accounts', payload)
                 .then(response => response.data.account),
         onMutate: createdAccount => {
+            methods.reset();
             queryClient.setQueryData<AccountItem[]>(
                 ['accountsData'],
                 (accounts = []) => [createdAccount, ...accounts]
