@@ -36,6 +36,46 @@ const FormInput = ({
     const { control, formState, getFieldState } = useFormContext();
     const { error } = getFieldState(name, formState);
 
+    const formatToColombianAmount = (rawValue: string): string => {
+        const cleanedValue = rawValue
+            .replace(/[^\d,.-]/g, '')
+            .replace(/-/g, '');
+
+        if (cleanedValue === '') {
+            return '';
+        }
+
+        const hasComma = cleanedValue.includes(',');
+
+        let integerPart = '';
+        let decimalPart = '';
+        let hasTrailingDecimalSeparator = false;
+
+        if (hasComma) {
+            const [integerCandidate, ...decimalCandidates] = cleanedValue
+                .replace(/\./g, '')
+                .split(',');
+
+            integerPart = integerCandidate.replace(/\D/g, '');
+            decimalPart = decimalCandidates.join('').replace(/\D/g, '');
+            hasTrailingDecimalSeparator = cleanedValue.endsWith(',');
+        } else {
+            integerPart = cleanedValue.replace(/\D/g, '');
+        }
+
+        const normalizedInteger = (integerPart || '0').replace(/^0+(?=\d)/, '');
+        const groupedInteger = normalizedInteger.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            '.'
+        );
+
+        if (decimalPart !== '' || hasTrailingDecimalSeparator) {
+            return `${groupedInteger},${decimalPart}`;
+        }
+
+        return groupedInteger;
+    };
+
     const getFieldType = (
         type: string,
         field: ControllerRenderProps<FieldValues, string>
@@ -101,27 +141,24 @@ const FormInput = ({
                         {...field}
                         label={label}
                         variant="outlined"
-                        type="number"
+                        type="text"
                         fullWidth
                         sx={styleInput}
-                        inputProps={{ min: 0, step: 'any' }}
-                        value={field.value ?? ''}
+                        inputProps={{
+                            inputMode: 'decimal',
+                            pattern: '[0-9.,]*',
+                        }}
+                        value={
+                            typeof field.value === 'number'
+                                ? formatToColombianAmount(
+                                      field.value.toString()
+                                  )
+                                : (field.value ?? '')
+                        }
                         onChange={event => {
-                            const value = event.target.value;
-
-                            if (value === '') {
-                                field.onChange('');
-                                return;
-                            }
-
-                            const parsedValue = Number(value);
-
-                            if (
-                                !Number.isNaN(parsedValue) &&
-                                parsedValue >= 0
-                            ) {
-                                field.onChange(parsedValue);
-                            }
+                            field.onChange(
+                                formatToColombianAmount(event.target.value)
+                            );
                         }}
                         error={!!error}
                         helperText={error && error?.message}
