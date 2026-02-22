@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { ErrorDetail } from './pages/ErrorDetail';
 import { Dashboard } from './pages/Dashboard';
+import { Accounts } from './pages/Accounts';
 import { ProtectedRoute } from './pages/ProtectedRoute';
 import { PublicRoute } from './pages/PublicRoute';
 
@@ -37,6 +38,14 @@ export const router = createBrowserRouter(
                 element={
                     <ProtectedRoute>
                         <Dashboard />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/accounts"
+                element={
+                    <ProtectedRoute>
+                        <Accounts />
                     </ProtectedRoute>
                 }
             />

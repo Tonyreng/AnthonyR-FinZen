@@ -29,6 +29,7 @@ function FormButton({
             size={buttonSize}
             {...(!ripple && { disableRipple: true })}
             disabled={disabled}
+            onClick={onClick}
         >
             {text}
         </Button>

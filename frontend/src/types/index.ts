@@ -57,3 +57,26 @@ export type DashboardResponse = {
     upcoming_payments: UpcomingPaymentsTypes[];
     ai_recommendations: AiRecommendations;
 };
+
+export type AccountTypeValue =
+    | 'bank'
+    | 'cash'
+    | 'credit_card'
+    | 'savings'
+    | 'virtual_wallet'
+    | 'investment'
+    | 'pension'
+    | 'other';
+
+export type AccountItem = {
+    id: number;
+    user_id: number;
+    name: string;
+    balance: string;
+    type: AccountTypeValue;
+    created_at: string;
+};
+
+export type AccountsResponse = {
+    accounts: AccountItem[];
+};

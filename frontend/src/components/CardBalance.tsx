@@ -27,7 +27,7 @@ export const CardBalance = ({ styles, totalBalance }: Props) => {
                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                         $
                         {totalBalance
-                            ? parseFloat(totalBalance).toLocaleString('en-CO', {
+                            ? parseFloat(totalBalance).toLocaleString('es-CO', {
                                   minimumFractionDigits: 2,
                                   maximumFractionDigits: 2,
                               })
