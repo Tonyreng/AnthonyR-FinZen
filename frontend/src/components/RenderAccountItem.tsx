@@ -24,7 +24,7 @@ export const accountTypeLabel: Record<AccountTypeValue, string> = {
     other: 'Otra',
 };
 
-const getAccountIcon = (type: AccountTypeValue) => {
+export const getAccountIcon = (type: AccountTypeValue) => {
     switch (type) {
         case 'bank':
             return <AccountBalanceRoundedIcon fontSize="small" />;
