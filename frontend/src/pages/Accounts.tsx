@@ -27,6 +27,23 @@ export const Accounts = () => {
         },
     });
 
+    const parseColombianAmountToNumber = (
+        formattedValue: string
+    ): number | '' => {
+        const cleanedValue = formattedValue
+            .replace(/\./g, '')
+            .replace(',', '.')
+            .replace(/[^\d.]/g, '');
+
+        if (cleanedValue === '') {
+            return '';
+        }
+
+        const parsedValue = Number(cleanedValue);
+
+        return Number.isNaN(parsedValue) ? '' : parsedValue;
+    };
+
     const { data: accounts, isLoading } = useAccounts();
 
     const createAccount = useCreateAccount({ methods });
@@ -46,6 +63,8 @@ export const Accounts = () => {
     };
 
     const handleCreateAccount = (data: AccountItem) => {
+        data.balance = parseColombianAmountToNumber(data.balance).toString();
+
         createAccount.mutate(data);
         setOpen(false);
     };
