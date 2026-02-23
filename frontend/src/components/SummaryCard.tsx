@@ -1,4 +1,5 @@
 import { Box, Card, CardContent, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     title?: string;
@@ -7,6 +8,9 @@ type Props = {
 };
 
 export const SummaryCard = ({ title, subHeader, children }: Props) => {
+    const { i18n } = useTranslation();
+    const currencyLocale = i18n.language.startsWith('en') ? 'en-US' : 'es-CO';
+
     return (
         <Card variant="outlined" sx={{ backgroundColor: 'background.default' }}>
             <CardContent>
@@ -19,13 +23,15 @@ export const SummaryCard = ({ title, subHeader, children }: Props) => {
                             {subHeader
                                 ? '$' +
                                   parseFloat(subHeader).toLocaleString(
-                                      'en-CO',
+                                      currencyLocale,
                                       {
                                           minimumFractionDigits: 2,
                                           maximumFractionDigits: 2,
                                       }
                                   )
-                                : '$0,00'}
+                                : currencyLocale === 'es-CO'
+                                  ? '0,00'
+                                  : '0.00'}
                         </Typography>
                     )}
                 </Box>

@@ -1,6 +1,7 @@
 import { Box, Typography, Stack } from '@mui/material';
 import { UpcomingPaymentsTypes } from '../types';
 import { UpcomingPaymentItem } from './UpcomingPaymentItem';
+import { useTranslation } from 'react-i18next';
 
 const getIconForPayment = (name: string): string => {
     const nameLower = name.toLowerCase();
@@ -26,17 +27,20 @@ const getIconForPayment = (name: string): string => {
     return 'calendar';
 };
 
-const formatPaymentDate = (dateString: string): string => {
+const formatPaymentDate = (
+    dateString: string,
+    t: (key: string, options?: { count?: number }) => string
+): string => {
     const date = new Date(dateString);
     const now = new Date();
 
     const diffTime = date.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Due today';
-    if (diffDays === 1) return 'Due tomorrow';
-    if (diffDays < 0) return 'Overdue';
-    return `Due in ${diffDays} days`;
+    if (diffDays === 0) return t('dashboard.upcomingPayments.dueToday');
+    if (diffDays === 1) return t('dashboard.upcomingPayments.dueTomorrow');
+    if (diffDays < 0) return t('dashboard.upcomingPayments.overdue');
+    return t('dashboard.upcomingPayments.dueInDays', { count: diffDays });
 };
 
 type props = {
@@ -44,11 +48,13 @@ type props = {
 };
 
 export const UpcomingPaymentsCard = ({ payments }: props) => {
+    const { t } = useTranslation();
+
     return (
         <Box sx={{ p: 1, mt: 3 }}>
             {payments?.length === 0 ? (
                 <Typography color="text.secondary" textAlign="center" py={2}>
-                    No upcoming payments
+                    {t('dashboard.upcomingPayments.empty')}
                 </Typography>
             ) : (
                 <Stack spacing={2}>
@@ -56,7 +62,7 @@ export const UpcomingPaymentsCard = ({ payments }: props) => {
                         <UpcomingPaymentItem
                             key={payment.id}
                             title={payment.name}
-                            due={formatPaymentDate(payment.payment_date)}
+                            due={formatPaymentDate(payment.payment_date, t)}
                             amount={parseFloat(payment.price)}
                             icon={getIconForPayment(payment.name)}
                         />

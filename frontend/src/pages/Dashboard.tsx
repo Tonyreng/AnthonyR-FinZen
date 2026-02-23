@@ -6,15 +6,39 @@ import { SummaryCard } from '../components/SummaryCard';
 import { TrendGraph } from '../components/TrendGraph';
 import { UpcomingPaymentsCard } from '../components/UpcomingPaymentsCard';
 import { AiRecommendationsCard } from '../components/AiRecommendationsCard';
+import { useTranslation } from 'react-i18next';
+import { Typography } from '@mui/material';
 
 export const Dashboard = () => {
     const { data, error, isLoading } = useDashboard();
 
+    const { t } = useTranslation();
+
+    if (isLoading) {
+        return (
+            <Box sx={{ px: 3, mt: 4 }}>
+                <Typography color="text.secondary">
+                    {t('dashboard.header.loading')}
+                </Typography>
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box sx={{ px: 3, mt: 4 }}>
+                <Typography color="error.main">
+                    {t('dashboard.header.error')}
+                </Typography>
+            </Box>
+        );
+    }
+
     return (
         <>
             <FormHeader
-                title="Dashboard Overview"
-                paragraph="Here's a snapshot of your financial health."
+                title={t('dashboard.header.title')}
+                paragraph={t('dashboard.header.paragraph')}
                 styles={{
                     px: 3,
                     mt: 4,
@@ -39,13 +63,19 @@ export const Dashboard = () => {
                     },
                 }}
             >
-                <SummaryCard title="Spending" subHeader={data?.expense_month}>
+                <SummaryCard
+                    title={t('dashboard.cards.spending')}
+                    subHeader={data?.expense_month}
+                >
                     <TrendGraph trendChartData={data?.expense_trend} />
                 </SummaryCard>
-                <SummaryCard title="Income" subHeader={data?.income_month}>
+                <SummaryCard
+                    title={t('dashboard.cards.income')}
+                    subHeader={data?.income_month}
+                >
                     <TrendGraph trendChartData={data?.income_trend} />
                 </SummaryCard>
-                <SummaryCard title="Upcoming Payments">
+                <SummaryCard title={t('dashboard.cards.upcomingPayments')}>
                     <UpcomingPaymentsCard payments={data?.upcoming_payments} />
                 </SummaryCard>
             </Box>
@@ -55,7 +85,7 @@ export const Dashboard = () => {
                     mt: 3,
                 }}
             >
-                <SummaryCard title="Recommendations">
+                <SummaryCard title={t('dashboard.cards.recommendations')}>
                     <AiRecommendationsCard
                         alerts={data?.ai_recommendations?.alerts}
                         recommendations={

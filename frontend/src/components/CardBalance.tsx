@@ -1,4 +1,5 @@
 import { Box, Card, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     styles?: object;
@@ -6,6 +7,9 @@ type Props = {
 };
 
 export const CardBalance = ({ styles, totalBalance }: Props) => {
+    const { t, i18n } = useTranslation();
+    const currencyLocale = i18n.language.startsWith('en') ? 'en-US' : 'es-CO';
+
     return (
         <Box sx={styles}>
             <Card
@@ -22,16 +26,21 @@ export const CardBalance = ({ styles, totalBalance }: Props) => {
                     }}
                 >
                     <Typography sx={{ color: 'primary.main' }}>
-                        Total Balance
+                        {t('dashboard.cards.totalBalance')}
                     </Typography>
                     <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                         $
                         {totalBalance
-                            ? parseFloat(totalBalance).toLocaleString('es-CO', {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                              })
-                            : '0,00'}
+                            ? parseFloat(totalBalance).toLocaleString(
+                                  currencyLocale,
+                                  {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                  }
+                              )
+                            : currencyLocale === 'es-CO'
+                              ? '0,00'
+                              : '0.00'}
                     </Typography>
                 </Box>
             </Card>
