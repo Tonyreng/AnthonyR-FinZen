@@ -1,4 +1,26 @@
 {
+    "login": {
+        "header": {
+            "title": "Log in to your account",
+            "paragraph": "Welcome back! Please enter your details."
+        },
+        "fields": {
+            "email": "Email address",
+            "password": "Password",
+            "rememberMe": "Remember me"
+        },
+        "actions": {
+            "forgotPassword": "Forgot your Password?",
+            "submit": "Log In",
+            "submitting": "Logging in..."
+        },
+        "validation": {
+            "emailRequired": "Email is required",
+            "emailInvalid": "Enter a valid email address",
+            "passwordRequired": "Password is required",
+            "passwordMinLength": "Password must be at least 4 characters"
+        }
+    },
     "dashboard": {
         "header": {
             "title": "Dashboard Overview",
@@ -68,5 +90,9 @@
                 "otherExpenses": "Other expenses"
             }
         }
+    },
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel"
     }
 }
