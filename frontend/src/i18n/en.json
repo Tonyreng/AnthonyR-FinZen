@@ -1,0 +1,12 @@
+{
+    "dashboard": {
+        "title": "Dashboard",
+        "income": "Income",
+        "expense": "Expense",
+        "aiInsights": "AI Insights"
+    },
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel"
+    }
+}

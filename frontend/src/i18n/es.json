@@ -1,0 +1,12 @@
+{
+    "dashboard": {
+        "title": "Panel",
+        "income": "Ingresos",
+        "expense": "Gastos",
+        "aiInsights": "Insights Inteligentes"
+    },
+    "common": {
+        "save": "Guardar",
+        "cancel": "Cancelar"
+    }
+}
