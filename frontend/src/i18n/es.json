@@ -1,9 +1,73 @@
 {
     "dashboard": {
-        "title": "Panel",
-        "income": "Ingresos",
-        "expense": "Gastos",
-        "aiInsights": "Insights Inteligentes"
+        "header": {
+            "title": "Panel de Resumen",
+            "paragraph": "Aquí tienes una vista general de tu salud financiera.",
+            "loading": "Cargando panel...",
+            "error": "No pudimos cargar la información del panel en este momento."
+        },
+        "cards": {
+            "totalBalance": "Balance total",
+            "spending": "Gastos",
+            "income": "Ingresos",
+            "upcomingPayments": "Próximos pagos",
+            "recommendations": "Recomendaciones"
+        },
+        "upcomingPayments": {
+            "empty": "No tienes pagos próximos",
+            "dueToday": "Vence hoy",
+            "dueTomorrow": "Vence mañana",
+            "overdue": "Vencido",
+            "dueInDays": "Vence en {{count}} días"
+        },
+        "ai": {
+            "label": "Sugerencia de IA",
+            "emptyTitle": "Aún no hay sugerencias de IA.",
+            "emptyBody": "Vuelve luego cuando tengamos más actividad para analizar.",
+            "nextInsight": "Toca para ver la siguiente recomendación",
+            "alerts": {
+                "spendingTrend3Months": "Tu tendencia de gasto, en porcentaje, ha venido aumentando durante los últimos 3 meses.",
+                "spendingMoreThanLastMonth": "Este mes, en porcentaje, estás gastando más dinero que el mes pasado.",
+                "netBalance": "Estás administrando bien tu dinero mes a mes, tu balance neto es {{netBalance}}",
+                "spendingMoreThanEarning": "Estás gastando más de lo que ganas.",
+                "savingsRateLow": "Tu tasa de ahorro es baja, estás ahorrando {{rate}}% de tus ingresos.",
+                "savingsRateAcceptable": "Tu tasa de ahorro es aceptable; estás ahorrando {{rate}}% de tus ingresos.",
+                "savingsRateExcellent": "Tu tasa de ahorro es excelente; estás ahorrando {{rate}}% de tus ingresos.",
+                "subscriptionsHigh": "Tus suscripciones representan una gran parte de tus gastos.",
+                "subscriptionsControlled": "Tus gastos en suscripciones están bajo control frente a tus gastos totales.",
+                "highSpendingCategory": "Alta concentración de gasto en {{category}}."
+            },
+            "recommendations": {
+                "trackExpenses": "Sigue controlando tus gastos e intenta mantener o aumentar tu balance neto.",
+                "reduceExpenses": "Reduce gastos o aumenta tus ingresos.",
+                "saveAtLeast15": "Procura ahorrar al menos el 15%.",
+                "saveAtLeast20": "Idealmente, deberías ahorrar siempre el 20%.",
+                "keepSaving": "Sigue con el buen hábito de ahorrar.",
+                "cancelSubscriptions": "Cancela suscripciones no esenciales.",
+                "reviewSubscriptions": "Revisa tus suscripciones con regularidad para asegurar que aún te aporten valor.",
+                "reduceCategoryExpenses": "Considera reducir gastos en {{category}}."
+            },
+            "categories": {
+                "salary": "Salario",
+                "freelance": "Freelance",
+                "cdtInterest": "Intereses CDT",
+                "refunds": "Reembolsos",
+                "sales": "Ventas",
+                "bonuses": "Bonificaciones",
+                "food": "Alimentación",
+                "transport": "Transporte",
+                "entertainment": "Entretenimiento",
+                "utilities": "Servicios",
+                "health": "Salud",
+                "education": "Educación",
+                "home": "Hogar",
+                "clothing": "Ropa",
+                "technology": "Tecnología",
+                "restaurants": "Restaurantes",
+                "subscriptions": "Suscripciones",
+                "otherExpenses": "Otros gastos"
+            }
+        }
     },
     "common": {
         "save": "Guardar",
