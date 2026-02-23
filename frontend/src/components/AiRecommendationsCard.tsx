@@ -1,5 +1,10 @@
 import { Box, ButtonBase, Typography } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    translateAiAlert,
+    translateAiRecommendation,
+} from '../i18n/aiRecommendations';
 
 type Props = {
     alerts?: string[];
@@ -7,6 +12,8 @@ type Props = {
 };
 
 export const AiRecommendationsCard = ({ alerts, recommendations }: Props) => {
+    const { t } = useTranslation();
+
     const pairCount = useMemo(() => {
         return Math.min(alerts?.length ?? 0, recommendations?.length ?? 0);
     }, [alerts, recommendations]);
@@ -30,11 +37,13 @@ export const AiRecommendationsCard = ({ alerts, recommendations }: Props) => {
     };
 
     const titleText =
-        pairCount > 0 ? alerts?.[index] : 'No AI suggestions yet.';
+        pairCount > 0 && alerts?.[index]
+            ? translateAiAlert(alerts[index], t)
+            : t('dashboard.ai.emptyTitle');
     const bodyText =
-        pairCount > 0
-            ? recommendations?.[index]
-            : 'Check back once we have more activity to analyze.';
+        pairCount > 0 && recommendations?.[index]
+            ? translateAiRecommendation(recommendations[index], t)
+            : t('dashboard.ai.emptyBody');
 
     return (
         <ButtonBase
@@ -64,7 +73,7 @@ export const AiRecommendationsCard = ({ alerts, recommendations }: Props) => {
             >
                 <Box sx={{ pr: { md: 1 } }}>
                     <Typography variant="overline" color="primary.light">
-                        AI Suggestion
+                        {t('dashboard.ai.label')}
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
                         {titleText}
@@ -82,7 +91,7 @@ export const AiRecommendationsCard = ({ alerts, recommendations }: Props) => {
                             color="text.secondary"
                             sx={{ mt: 1, display: 'block' }}
                         >
-                            Tap to see the next insight
+                            {t('dashboard.ai.nextInsight')}
                         </Typography>
                     )}
                 </Box>
