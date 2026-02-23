@@ -1,12 +1,72 @@
 {
     "dashboard": {
-        "title": "Dashboard",
-        "income": "Income",
-        "expense": "Expense",
-        "aiInsights": "AI Insights"
-    },
-    "common": {
-        "save": "Save",
-        "cancel": "Cancel"
+        "header": {
+            "title": "Dashboard Overview",
+            "paragraph": "Here's a snapshot of your financial health.",
+            "loading": "Loading dashboard...",
+            "error": "We couldn't load your dashboard data right now."
+        },
+        "cards": {
+            "totalBalance": "Total Balance",
+            "spending": "Spending",
+            "income": "Income",
+            "upcomingPayments": "Upcoming Payments",
+            "recommendations": "Recommendations"
+        },
+        "upcomingPayments": {
+            "empty": "No upcoming payments",
+            "dueToday": "Due today",
+            "dueTomorrow": "Due tomorrow",
+            "overdue": "Overdue",
+            "dueInDays": "Due in {{count}} days"
+        },
+        "ai": {
+            "label": "AI Suggestion",
+            "emptyTitle": "No AI suggestions yet.",
+            "emptyBody": "Check back once we have more activity to analyze.",
+            "nextInsight": "Tap to see the next insight",
+            "alerts": {
+                "spendingTrend3Months": "Your spending trend, percentage-wise, has been increasing over the last 3 months.",
+                "spendingMoreThanLastMonth": "This month, percentage-wise, you are spending more money than last month.",
+                "netBalance": "You are managing your money well month after month, your net balance is {{netBalance}}",
+                "spendingMoreThanEarning": "You are spending more than you earn.",
+                "savingsRateLow": "Your savings rate is low, you are saving {{rate}}% of your income.",
+                "savingsRateAcceptable": "Your savings rate is acceptable; you are saving {{rate}}% of your income.",
+                "savingsRateExcellent": "Your savings rate is excellent; you are saving {{rate}}% of your income.",
+                "subscriptionsHigh": "Your subscriptions make up a large portion of your expenses.",
+                "subscriptionsControlled": "Your subscription expenses are under control compared to your total expenses.",
+                "highSpendingCategory": "High concentration of spending in {{category}}."
+            },
+            "recommendations": {
+                "trackExpenses": "Keep tracking your expenses and try to maintain or increase your net balance.",
+                "reduceExpenses": "Reduce expenses or increase income.",
+                "saveAtLeast15": "Aim to save at least 15%.",
+                "saveAtLeast20": "Ideally, you should always save 20%.",
+                "keepSaving": "Keep up the good work saving money.",
+                "cancelSubscriptions": "Cancel non-essential subscriptions.",
+                "reviewSubscriptions": "Review your subscriptions regularly to ensure they still provide value.",
+                "reduceCategoryExpenses": "Consider reducing expenses in {{category}}."
+            },
+            "categories": {
+                "salary": "Salary",
+                "freelance": "Freelance",
+                "cdtInterest": "CDT Interest",
+                "refunds": "Refunds",
+                "sales": "Sales",
+                "bonuses": "Bonuses",
+                "food": "Food",
+                "transport": "Transport",
+                "entertainment": "Entertainment",
+                "utilities": "Utilities",
+                "health": "Health",
+                "education": "Education",
+                "home": "Home",
+                "clothing": "Clothing",
+                "technology": "Technology",
+                "restaurants": "Restaurants",
+                "subscriptions": "Subscriptions",
+                "otherExpenses": "Other expenses"
+            }
+        }
     }
 }
