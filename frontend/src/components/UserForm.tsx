@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import FormInput from './FormInput';
 import FormHeader from './FormHeader';
 import FormButton from './FormButton';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     onSubmit: (data: LoginFormInputs) => void;
@@ -12,6 +13,8 @@ type Props = {
 };
 
 const UserForm = ({ onSubmit, methods, isPending }: Props) => {
+    const { t } = useTranslation();
+
     return (
         <Box
             sx={{
@@ -21,8 +24,8 @@ const UserForm = ({ onSubmit, methods, isPending }: Props) => {
             }}
         >
             <FormHeader
-                title="Log in to your account"
-                paragraph="Welcome back! Please enter your details."
+                title={t('login.header.title')}
+                paragraph={t('login.header.paragraph')}
                 styles={{ mb: 3 }}
             />
             <FormProvider {...methods}>
@@ -33,27 +36,26 @@ const UserForm = ({ onSubmit, methods, isPending }: Props) => {
                 >
                     <FormInput
                         name="email"
-                        label="Email address"
+                        label={t('login.fields.email')}
                         type="textfield"
                         rules={{
-                            required: 'Email is required',
+                            required: t('login.validation.emailRequired'),
                             pattern: {
                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                message: 'Enter a valid email address',
+                                message: t('login.validation.emailInvalid'),
                             },
                         }}
                     />
 
                     <FormInput
                         name="password"
-                        label="Password"
+                        label={t('login.fields.password')}
                         type="password"
                         rules={{
-                            required: 'Password is required',
+                            required: t('login.validation.passwordRequired'),
                             minLength: {
                                 value: 4,
-                                message:
-                                    'Password must be at least 4 characters',
+                                message: t('login.validation.passwordMinLength'),
                             },
                         }}
                     />
@@ -65,7 +67,7 @@ const UserForm = ({ onSubmit, methods, isPending }: Props) => {
                     >
                         <FormInput
                             name="rememberMe"
-                            label="Remember me"
+                            label={t('login.fields.rememberMe')}
                             type="checkbox"
                             styleInput={{
                                 '& .MuiFormControlLabel-label': {
@@ -77,7 +79,7 @@ const UserForm = ({ onSubmit, methods, isPending }: Props) => {
                             }}
                         />
                         <FormButton
-                            text="Forgot your Password?"
+                            text={t('login.actions.forgotPassword')}
                             buttonStyle={{
                                 padding: 0,
                                 ':focus': { outline: 'none' },
@@ -93,7 +95,11 @@ const UserForm = ({ onSubmit, methods, isPending }: Props) => {
                     <Box>
                         <FormButton
                             disabled={isPending}
-                            text={isPending ? 'Logging in...' : 'Log In'}
+                            text={
+                                isPending
+                                    ? t('login.actions.submitting')
+                                    : t('login.actions.submit')
+                            }
                             buttonStyle={{
                                 width: '100%',
                                 ':hover': {
