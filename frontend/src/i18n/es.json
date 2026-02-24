@@ -91,6 +91,50 @@
             }
         }
     },
+    "accounts": {
+        "page": {
+            "title": "Cuentas",
+            "addAccount": "Añadir cuenta",
+            "listTitle": "Tus cuentas",
+            "loading": "Cargando cuentas...",
+            "empty": "Aún no tienes cuentas. Crea tu primera cuenta con \"Añadir cuenta\"."
+        },
+        "dialog": {
+            "title": "Nueva Cuenta",
+            "subtitle": "Selecciona el tipo y completa los datos",
+            "accountType": "Tipo de cuenta",
+            "fields": {
+                "name": "Nombre de la cuenta",
+                "balance": "Balance inicial"
+            },
+            "actions": {
+                "create": "Crear Cuenta",
+                "saving": "Guardando..."
+            },
+            "validation": {
+                "typeRequired": "El tipo de cuenta es requerido",
+                "nameRequired": "El nombre de la cuenta es requerido",
+                "nameMinLength": "El nombre de la cuenta debe tener al menos 3 caracteres",
+                "balanceRequired": "El balance inicial es requerido",
+                "balanceNonNegative": "El balance inicial no puede ser negativo"
+            },
+            "aria": {
+                "closeDialog": "Cerrar diálogo",
+                "scrollLeft": "Mover tipos de cuenta a la izquierda",
+                "scrollRight": "Mover tipos de cuenta a la derecha"
+            }
+        },
+        "types": {
+            "bank": "Banco",
+            "cash": "Efectivo",
+            "credit_card": "Tarjeta de Crédito",
+            "savings": "Ahorros",
+            "virtual_wallet": "Billetera Virtual",
+            "investment": "Inversión",
+            "pension": "Pensión",
+            "other": "Otra"
+        }
+    },
     "common": {
         "save": "Guardar",
         "cancel": "Cancelar"
