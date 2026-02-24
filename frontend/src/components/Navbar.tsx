@@ -12,19 +12,21 @@ import {
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { MouseEvent, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer';
 import { logoutService } from '../services/auth.services';
 
 const protectedNavItems = [
-    { label: 'Overview', to: '/dashboard' },
-    { label: 'Accounts', to: '/accounts' },
-    { label: 'Subscriptions', to: '/' },
-    { label: 'Debts', to: '/' },
-    { label: 'Reports', to: '/' },
+    { key: 'overview', to: '/dashboard' },
+    { key: 'accounts', to: '/accounts' },
+    { key: 'subscriptions', to: '/' },
+    { key: 'debts', to: '/' },
+    { key: 'reports', to: '/' },
 ];
 
 export const Navbar = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
     const { store, dispatch } = useGlobalReducer();
@@ -38,18 +40,18 @@ export const Navbar = () => {
     const publicCta = useMemo(() => {
         if (location.pathname === '/signup') {
             return {
-                helper: 'Already have an account?',
-                actionLabel: 'Log In',
+                helper: t('navbar.publicCta.alreadyHaveAccount'),
+                actionLabel: t('navbar.publicCta.logIn'),
                 actionTo: '/login',
             };
         }
 
         return {
-            helper: "Don't have an account?",
-            actionLabel: 'Sign Up',
+            helper: t('navbar.publicCta.dontHaveAccount'),
+            actionLabel: t('navbar.publicCta.signUp'),
             actionTo: '/signup',
         };
-    }, [location.pathname]);
+    }, [location.pathname, t]);
 
     const handleOpenMenu = (event: MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -130,7 +132,7 @@ export const Navbar = () => {
                         >
                             {protectedNavItems.map(item => (
                                 <Button
-                                    key={item.label}
+                                    key={item.key}
                                     component={RouterLink}
                                     to={item.to}
                                     sx={{
@@ -151,7 +153,7 @@ export const Navbar = () => {
                                         },
                                     }}
                                 >
-                                    {item.label}
+                                    {t(`navbar.navItems.${item.key}`)}
                                 </Button>
                             ))}
                         </Box>
@@ -208,10 +210,10 @@ export const Navbar = () => {
                                 }}
                             >
                                 <MenuItem onClick={handleCloseMenu}>
-                                    Settings
+                                    {t('navbar.menu.settings')}
                                 </MenuItem>
                                 <MenuItem onClick={handleLogout}>
-                                    Log out
+                                    {t('navbar.menu.logout')}
                                 </MenuItem>
                             </Menu>
                         </Box>
