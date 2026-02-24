@@ -91,6 +91,50 @@
             }
         }
     },
+    "accounts": {
+        "page": {
+            "title": "Accounts",
+            "addAccount": "Add account",
+            "listTitle": "Your accounts",
+            "loading": "Loading accounts...",
+            "empty": "You don't have any accounts yet. Create your first account with \"Add account\"."
+        },
+        "dialog": {
+            "title": "New Account",
+            "subtitle": "Select the type and complete the details",
+            "accountType": "Account type",
+            "fields": {
+                "name": "Account name",
+                "balance": "Initial balance"
+            },
+            "actions": {
+                "create": "Create Account",
+                "saving": "Saving..."
+            },
+            "validation": {
+                "typeRequired": "Account type is required",
+                "nameRequired": "Account name is required",
+                "nameMinLength": "Account name must be at least 3 characters",
+                "balanceRequired": "Initial balance is required",
+                "balanceNonNegative": "Initial balance cannot be negative"
+            },
+            "aria": {
+                "closeDialog": "Close dialog",
+                "scrollLeft": "Move account types to the left",
+                "scrollRight": "Move account types to the right"
+            }
+        },
+        "types": {
+            "bank": "Bank",
+            "cash": "Cash",
+            "credit_card": "Credit Card",
+            "savings": "Savings",
+            "virtual_wallet": "Virtual Wallet",
+            "investment": "Investment",
+            "pension": "Pension",
+            "other": "Other"
+        }
+    },
     "common": {
         "save": "Save",
         "cancel": "Cancel"

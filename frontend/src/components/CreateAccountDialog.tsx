@@ -18,6 +18,7 @@ import { Controller, FormProvider, UseFormReturn } from 'react-hook-form';
 import { useRef } from 'react';
 import FormInput from './FormInput';
 import FormButton from './FormButton';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     open: boolean;
@@ -45,6 +46,8 @@ export const CreateAccountDialog = ({
     methods,
     handleSubmit,
 }: Props) => {
+    const { t } = useTranslation();
+
     const accountTypeCarouselRef = useRef<HTMLDivElement | null>(null);
 
     const handleScrollTypes = (direction: 'left' | 'right') => {
@@ -81,17 +84,17 @@ export const CreateAccountDialog = ({
                     >
                         <Box>
                             <Typography variant="h5" sx={{ mb: 0.5 }}>
-                                Nueva Cuenta
+                                {t('accounts.dialog.title')}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Selecciona el tipo y completa los datos
+                                {t('accounts.dialog.subtitle')}
                             </Typography>
                         </Box>
                         <IconButton
                             onClick={handleClose}
                             disabled={isPending}
                             size="small"
-                            aria-label="Cerrar diálogo"
+                            aria-label={t('accounts.dialog.aria.closeDialog')}
                         >
                             <CloseRoundedIcon fontSize="small" />
                         </IconButton>
@@ -105,13 +108,15 @@ export const CreateAccountDialog = ({
                                 color="text.secondary"
                                 sx={{ display: 'block', mb: 1.25 }}
                             >
-                                Tipo de cuenta
+                                {t('accounts.dialog.accountType')}
                             </Typography>
                             <Controller
                                 name="type"
                                 control={methods.control}
                                 rules={{
-                                    required: 'El tipo de cuenta es requerido',
+                                    required: t(
+                                        'accounts.dialog.validation.typeRequired'
+                                    ),
                                 }}
                                 render={({ field }) => (
                                     <Stack
@@ -129,7 +134,9 @@ export const CreateAccountDialog = ({
                                             onClick={() =>
                                                 handleScrollTypes('left')
                                             }
-                                            aria-label="Mover tipos de cuenta a la izquierda"
+                                            aria-label={t(
+                                                'accounts.dialog.aria.scrollLeft'
+                                            )}
                                         >
                                             <ChevronLeftRoundedIcon fontSize="small" />
                                         </IconButton>
@@ -214,7 +221,7 @@ export const CreateAccountDialog = ({
                                                                 {
                                                                     accountTypeLabel[
                                                                         typeOption
-                                                                    ]
+                                                                    ](t)
                                                                 }
                                                             </Typography>
                                                         </Stack>
@@ -233,7 +240,9 @@ export const CreateAccountDialog = ({
                                             onClick={() =>
                                                 handleScrollTypes('right')
                                             }
-                                            aria-label="Mover tipos de cuenta a la derecha"
+                                            aria-label={t(
+                                                'accounts.dialog.aria.scrollRight'
+                                            )}
                                         >
                                             <ChevronRightRoundedIcon fontSize="small" />
                                         </IconButton>
@@ -251,27 +260,33 @@ export const CreateAccountDialog = ({
                         </Box>
                         <FormInput
                             name="name"
-                            label="Nombre de la cuenta"
+                            label={t('accounts.dialog.fields.name')}
                             type="textfield"
                             rules={{
-                                required: 'El nombre de la cuenta es requerido',
+                                required: t(
+                                    'accounts.dialog.validation.nameRequired'
+                                ),
                                 minLength: {
                                     value: 3,
-                                    message:
-                                        'El nombre de la cuenta debe tener al menos 3 caracteres',
+                                    message: t(
+                                        'accounts.dialog.validation.nameMinLength'
+                                    ),
                                 },
                             }}
                         />
                         <FormInput
                             name="balance"
-                            label="Balance inicial"
+                            label={t('accounts.dialog.fields.balance')}
                             type="number"
                             rules={{
-                                required: 'El balance inicial es requerido',
+                                required: t(
+                                    'accounts.dialog.validation.balanceRequired'
+                                ),
                                 min: {
                                     value: 0,
-                                    message:
-                                        'El balance inicial no puede ser negativo',
+                                    message: t(
+                                        'accounts.dialog.validation.balanceNonNegative'
+                                    ),
                                 },
                             }}
                         />
@@ -279,7 +294,11 @@ export const CreateAccountDialog = ({
                             buttonVariant="contained"
                             ButtonType="submit"
                             disabled={isPending}
-                            text={isPending ? 'Guardando...' : 'Crear Cuenta'}
+                            text={
+                                isPending
+                                    ? t('accounts.dialog.actions.saving')
+                                    : t('accounts.dialog.actions.create')
+                            }
                             buttonStyle={{ mt: 1, py: 1.1 }}
                         />
                     </Stack>
