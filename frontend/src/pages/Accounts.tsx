@@ -14,8 +14,11 @@ import { AccountItem } from '../types';
 import { renderAccountItem } from '../components/RenderAccountItem';
 import { useForm } from 'react-hook-form';
 import { CreateAccountDialog } from '../components/CreateAccountDialog';
+import { useTranslation } from 'react-i18next';
 
 export const Accounts = () => {
+    const { t, i18n } = useTranslation();
+
     const methods = useForm<AccountItem>({
         defaultValues: {
             id: 1,
@@ -85,13 +88,13 @@ export const Accounts = () => {
                 spacing={2}
                 sx={{ mb: 3 }}
             >
-                <Typography variant="h2">Cuentas</Typography>
+                <Typography variant="h2">{t('accounts.page.title')}</Typography>
                 <Button
                     variant="contained"
                     startIcon={<AddRoundedIcon />}
                     onClick={handleOpen}
                 >
-                    Añadir cuenta
+                    {t('accounts.page.addAccount')}
                 </Button>
             </Stack>
 
@@ -103,18 +106,19 @@ export const Accounts = () => {
                 }}
             >
                 <Box sx={{ px: { xs: 2, md: 3 }, py: 2.5 }}>
-                    <Typography variant="h4">Tus cuentas</Typography>
+                    <Typography variant="h4">
+                        {t('accounts.page.listTitle')}
+                    </Typography>
                 </Box>
                 <Divider />
 
                 {isLoading ? (
                     <Typography sx={{ px: 3, py: 4 }} color="text.secondary">
-                        Cargando cuentas...
+                        {t('accounts.page.loading')}
                     </Typography>
                 ) : sortedAccounts.length === 0 ? (
                     <Typography sx={{ px: 3, py: 4 }} color="text.secondary">
-                        Aún no tienes cuentas. Crea tu primera cuenta con
-                        “Añadir cuenta”.
+                        {t('accounts.page.empty')}
                     </Typography>
                 ) : (
                     <List disablePadding>
@@ -123,6 +127,8 @@ export const Accounts = () => {
                                 account,
                                 index,
                                 sortedAccounts,
+                                t,
+                                i18n,
                             })
                         )}
                     </List>
