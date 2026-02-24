@@ -135,6 +135,25 @@
             "other": "Otra"
         }
     },
+    "navbar": {
+        "navItems": {
+            "overview": "Resumen",
+            "accounts": "Cuentas",
+            "subscriptions": "Suscripciones",
+            "debts": "Deudas",
+            "reports": "Reportes"
+        },
+        "publicCta": {
+            "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+            "dontHaveAccount": "¿No tienes una cuenta?",
+            "logIn": "Iniciar sesión",
+            "signUp": "Regístrate"
+        },
+        "menu": {
+            "settings": "Configuración",
+            "logout": "Cerrar sesión"
+        }
+    },
     "common": {
         "save": "Guardar",
         "cancel": "Cancelar"
