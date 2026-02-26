@@ -20,6 +20,7 @@ import { logoutService } from '../services/auth.services';
 const protectedNavItems = [
     { key: 'overview', to: '/dashboard' },
     { key: 'accounts', to: '/accounts' },
+    { key: 'transactions', to: '/transactions' },
     { key: 'subscriptions', to: '/' },
     { key: 'debts', to: '/' },
     { key: 'reports', to: '/' },
