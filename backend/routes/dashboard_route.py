@@ -10,6 +10,12 @@ import locale
 dashboard_bp = Blueprint("dashboard_bp", __name__)
 
 
+def safe_division(numerator, denominator):
+    if not denominator:
+        return 0
+    return numerator / denominator
+
+
 @dashboard_bp.route("/user/dashboard", methods=["GET"])
 @jwt_required()
 def get_dashboard_summary():
@@ -223,10 +229,10 @@ def get_dashboard_summary():
 
         net_now = inc_now - exp_now
         net_prev = inc_prev - exp_prev
-        porc_exp_now = exp_now / inc_now
-        porc_exp_prev_month_part = exp_prev_part / inc_prev_part
-        porc_exp_prev_month_full = exp_prev / inc_prev
-        porc_exp_prev_month_full2 = exp_prev2 / inc_prev2
+        porc_exp_now = safe_division(exp_now, inc_now)
+        porc_exp_prev_month_part = safe_division(exp_prev_part, inc_prev_part)
+        porc_exp_prev_month_full = safe_division(exp_prev, inc_prev)
+        porc_exp_prev_month_full2 = safe_division(exp_prev2, inc_prev2)
 
         savings_rate = (net_prev / inc_prev) if inc_prev else 0
 
@@ -249,54 +255,78 @@ def get_dashboard_summary():
                 ".", ",").replace("X", ".")
         )
 
-        if porc_exp_now > porc_exp_prev_month_part:
-            if porc_exp_prev_month_full > porc_exp_prev_month_full2:
+        has_current_income_basis = inc_now > 0
+        has_partial_previous_income_basis = inc_prev_part > 0
+        has_previous_income_basis = inc_prev > 0
+        has_previous2_income_basis = inc_prev2 > 0
+        has_spending_trend_basis = (
+            has_current_income_basis and
+            has_partial_previous_income_basis and
+            has_previous_income_basis and
+            has_previous2_income_basis
+        )
+
+        if has_spending_trend_basis:
+            if porc_exp_now > porc_exp_prev_month_part and porc_exp_prev_month_full > porc_exp_prev_month_full2:
                 score += 35
                 alerts.append(
                     "Your spending trend, percentage-wise, has been increasing over the last 3 months.")
-            else:
+            elif porc_exp_now > porc_exp_prev_month_part:
                 score += 30
                 alerts.append(
                     "This month, percentage-wise, you are spending more money than last month.")
-        alerts.append(
-            f"You are managing your money well month after month, your net balance is {net_now_formatted}")
-        recommendations.append(
-            "Keep tracking your expenses and try to maintain or increase your net balance.")
+            else:
+                alerts.append(
+                    f"You are managing your money well month after month, your net balance is {net_now_formatted}")
+                recommendations.append(
+                    "Keep tracking your expenses and try to maintain or increase your net balance.")
 
-        if savings_rate < 0:
-            score += 20
-            alerts.append("You are spending more than you earn.")
-            recommendations.append("Reduce expenses or increase income.")
-        elif savings_rate < 0.10:
-            score += 10
-            alerts.append(
-                f"Your savings rate is low, you are saving {round(savings_rate * 100, 2)}% of your income.")
-            recommendations.append("Aim to save at least 15%.")
-        elif savings_rate < 0.20:
-            score += 5
-            alerts.append(
-                f"Your savings rate is acceptable; you are saving {round(savings_rate * 100, 2)}% of your income.")
-            recommendations.append("Ideally, you should always save 20%.")
-        else:
-            alerts.append(
-                f"Your savings rate is excellent; you are saving {round(savings_rate * 100, 2)}% of your income.")
-            recommendations.append("Keep up the good work saving money.")
+            if savings_rate < 0:
+                score += 20
+                alerts.append("You are spending more than you earn.")
+                recommendations.append("Reduce expenses or increase income.")
+            elif savings_rate < 0.10:
+                score += 10
+                alerts.append(
+                    f"Your savings rate is low, you are saving {round(savings_rate * 100, 2)}% of your income.")
+                recommendations.append("Aim to save at least 15%.")
+            elif savings_rate < 0.20:
+                score += 5
+                alerts.append(
+                    f"Your savings rate is acceptable; you are saving {round(savings_rate * 100, 2)}% of your income.")
+                recommendations.append("Ideally, you should always save 20%.")
+            else:
+                alerts.append(
+                    f"Your savings rate is excellent; you are saving {round(savings_rate * 100, 2)}% of your income.")
+                recommendations.append("Keep up the good work saving money.")
 
-        if sub_ratio > 0.25:
-            score += 15
+            if sub_ratio > 0.25:
+                score += 15
+                alerts.append(
+                    "Your subscriptions make up a large portion of your expenses.")
+                recommendations.append("Cancel non-essential subscriptions.")
             alerts.append(
-                "Your subscriptions make up a large portion of your expenses.")
-            recommendations.append("Cancel non-essential subscriptions.")
-        alerts.append(
-            "Your subscription expenses are under control compared to your total expenses.")
-        recommendations.append(
-            "Review your subscriptions regularly to ensure they still provide value.")
-
-        if top_cat_ratio > 0.4:
-            score += 10
-            alerts.append(f"High concentration of spending in {top_cat.name}.")
+                "Your subscription expenses are under control compared to your total expenses.")
             recommendations.append(
-                f"Consider reducing expenses in {top_cat.name}.")
+                "Review your subscriptions regularly to ensure they still provide value.")
+
+            if top_cat_ratio > 0.4:
+                score += 10
+                alerts.append(
+                    f"High concentration of spending in {top_cat.name}.")
+                recommendations.append(
+                    f"Consider reducing expenses in {top_cat.name}.")
+
+        elif not has_spending_trend_basis:
+            logging.info(
+                "Skipping spending trend comparison for user %s due to missing income basis: "
+                "inc_now=%s inc_prev_part=%s inc_prev=%s inc_prev2=%s",
+                user_id,
+                inc_now,
+                inc_prev_part,
+                inc_prev,
+                inc_prev2,
+            )
 
         # ── Clasificación ─────────────────────────────────────
         if score >= 61:
@@ -313,7 +343,14 @@ def get_dashboard_summary():
             "recommendations": recommendations
         }
 
-        logging.info(f"Dashboard summary fetched for user : {user_id}")
+        logging.info(
+            "Dashboard summary fetched for user %s with balances: inc_now=%s exp_now=%s inc_prev=%s exp_prev=%s",
+            user_id,
+            inc_now,
+            exp_now,
+            inc_prev,
+            exp_prev,
+        )
 
         return jsonify({
             "total_balance": str(total_balance),
@@ -325,5 +362,5 @@ def get_dashboard_summary():
             "ai_recommendations": ai_recomendations_data
         }), 200
     except Exception as e:
-        logging.error(f"Error fetching dashboard summary: {str(e)}")
+        logging.exception(f"Error fetching dashboard summary: {str(e)}")
         return jsonify({"msg": "Internal server error"}), 500
