@@ -1,18 +1,24 @@
 import FormHeader from '../components/FormHeader';
 import { CardBalance } from '../components/CardBalance';
 import { useDashboard } from '../hooks/useDashboard';
-import { Box } from '@mui/material';
+import { Alert, Box, Button } from '@mui/material';
 import { SummaryCard } from '../components/SummaryCard';
 import { TrendGraph } from '../components/TrendGraph';
 import { UpcomingPaymentsCard } from '../components/UpcomingPaymentsCard';
 import { AiRecommendationsCard } from '../components/AiRecommendationsCard';
 import { useTranslation } from 'react-i18next';
 import { Typography } from '@mui/material';
+import { AxiosError } from 'axios';
+import { DashboardErrorResponse } from '../types';
 
 export const Dashboard = () => {
-    const { data, error, isLoading } = useDashboard();
+    const { data, error, isLoading, refetch, isFetching } = useDashboard();
 
     const { t } = useTranslation();
+
+    const dashboardError = error as AxiosError<DashboardErrorResponse> | null;
+    const errorMessage =
+        dashboardError?.response?.data?.msg || dashboardError?.message;
 
     if (isLoading) {
         return (
@@ -27,9 +33,30 @@ export const Dashboard = () => {
     if (error) {
         return (
             <Box sx={{ px: 3, mt: 4 }}>
-                <Typography color="error.main">
-                    {t('dashboard.header.error')}
-                </Typography>
+                <Alert
+                    severity="error"
+                    action={
+                        <Button
+                            color="inherit"
+                            size="small"
+                            onClick={() => void refetch()}
+                            disabled={isFetching}
+                        >
+                            {t('dashboard.header.retry')}
+                        </Button>
+                    }
+                >
+                    <Typography sx={{ fontWeight: 600 }}>
+                        {t('dashboard.header.error')}
+                    </Typography>
+                    {errorMessage ? (
+                        <Typography variant="body2" sx={{ mt: 0.5 }}>
+                            {t('dashboard.header.errorDetails', {
+                                message: errorMessage,
+                            })}
+                        </Typography>
+                    ) : null}
+                </Alert>
             </Box>
         );
     }
