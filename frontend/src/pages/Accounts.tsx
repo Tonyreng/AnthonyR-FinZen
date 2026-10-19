@@ -10,7 +10,7 @@ import {
 import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import { useMemo, useState } from 'react';
 import { useAccounts, useCreateAccount } from '../hooks/useAccounts';
-import { AccountItem } from '../types';
+import type { AccountItem } from '../types';
 import { renderAccountItem } from '../components/RenderAccountItem';
 import { useForm } from 'react-hook-form';
 import { CreateAccountDialog } from '../components/CreateAccountDialog';

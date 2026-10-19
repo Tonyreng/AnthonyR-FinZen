@@ -1,4 +1,4 @@
-import { storeType, actionType } from './types';
+import type { storeType, actionType } from './types';
 
 export const initialStore = (): storeType => {
     return {

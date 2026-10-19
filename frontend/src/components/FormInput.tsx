@@ -10,11 +10,9 @@ import {
 } from '@mui/material';
 import {
     Controller,
-    ControllerRenderProps,
-    FieldValues,
     useFormContext,
 } from 'react-hook-form';
-import { AccountTypeValue } from '../types';
+import type { ControllerRenderProps, FieldValues } from 'react-hook-form';
 
 type Props = {
     name: string;
@@ -22,7 +20,7 @@ type Props = {
     label?: string;
     type: string;
     styleInput?: object;
-    options?: Record<AccountTypeValue, string>;
+    options?: Record<string, string>;
 };
 
 const FormInput = ({
@@ -87,7 +85,7 @@ const FormInput = ({
                         {...field}
                         label={label}
                         variant="outlined"
-                        type={type}
+                        type="text"
                         fullWidth
                         error={!!error}
                         helperText={error && error?.message}
@@ -160,6 +158,21 @@ const FormInput = ({
                                 formatToColombianAmount(event.target.value)
                             );
                         }}
+                        error={!!error}
+                        helperText={error && error?.message}
+                    />
+                );
+            case 'date':
+                return (
+                    <TextField
+                        {...field}
+                        label={label}
+                        variant="outlined"
+                        type="date"
+                        fullWidth
+                        sx={styleInput}
+                        value={field.value ?? ''}
+                        InputLabelProps={{ shrink: true }}
                         error={!!error}
                         helperText={error && error?.message}
                     />

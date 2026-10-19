@@ -1,0 +1,15 @@
+**
+!backend
+!backend/**
+backend/.env
+backend/.venv
+backend/venv
+backend/__pycache__
+backend/**/*.pyc
+backend/**/*.pyo
+backend/.pytest_cache
+backend/htmlcov
+backend/.coverage
+backend/logs
+backend/*.db
+backend/*.sqlite*

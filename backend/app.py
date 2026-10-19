@@ -1,32 +1,49 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-from flask_jwt_extended import jwt_required as jwt_req, get_jwt_identity as get_jwt_id
-from routes.login_route import limiter
+import logging
 import os
-from flask import Flask, request, jsonify, url_for, send_from_directory
-from flask_migrate import Migrate
+from logging.handlers import RotatingFileHandler
+
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request, send_from_directory, url_for
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from dotenv import load_dotenv
-from routes import register_routes
-from database import db
-from models import *
+from flask_jwt_extended import get_jwt_identity as get_jwt_id
+from flask_jwt_extended import jwt_required as jwt_req
+from flask_migrate import Migrate
+from sqlalchemy import text
+
 from admin import setup_admin
 from commands import setup_commands
-import logging
-from logging.handlers import RotatingFileHandler
-import os
+from database import db
+from models import *
+from routes import register_routes
+from routes.login_route import limiter
 
 
-# Load environment variables
+# Load environment variables from the project root first.
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+load_dotenv(os.path.join(PROJECT_ROOT, '.env'))
 load_dotenv()
+
+
+def get_bool_env(name: str, default: bool) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def get_list_env(name: str, default: str) -> list[str]:
+    value = os.getenv(name, default)
+    return [item.strip() for item in value.split(',') if item.strip()]
 
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
-static_file_dir = os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), '../dist/')
+static_file_dir = os.path.join(BASE_DIR, '../dist/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
@@ -72,13 +89,22 @@ MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
 
 # JWT Configuration
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')
+jwt_secret_key = os.getenv('JWT_SECRET_KEY')
+
+if not jwt_secret_key:
+    if ENV == 'production':
+        raise RuntimeError('JWT_SECRET_KEY is required in production')
+    jwt_secret_key = 'dev-only-secret-key'
+
+app.config['JWT_SECRET_KEY'] = jwt_secret_key
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']  # Headers first
 app.config['JWT_HEADER_NAME'] = 'Authorization'
 app.config['JWT_HEADER_TYPE'] = 'Bearer'
-app.config['JWT_COOKIE_SECURE'] = False  # True en producción con HTTPS
-app.config['JWT_COOKIE_CSRF_PROTECT'] = False  # Activar en producción
-app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
+app.config['JWT_COOKIE_SECURE'] = get_bool_env(
+    'JWT_COOKIE_SECURE', ENV == 'production')
+app.config['JWT_COOKIE_CSRF_PROTECT'] = get_bool_env(
+    'JWT_COOKIE_CSRF_PROTECT', ENV == 'production')
+app.config['JWT_COOKIE_SAMESITE'] = os.getenv('JWT_COOKIE_SAMESITE', 'Lax')
 jwt = JWTManager(app)
 
 
@@ -107,14 +133,22 @@ def missing_token_callback(error):
 
 
 # Enable CORS with credentials support
+default_cors_origins = 'http://localhost:3000,http://localhost:5173' \
+    if ENV == 'development' else ''
+cors_origins = get_list_env('CORS_ORIGINS', default_cors_origins)
+
+if not cors_origins and ENV == 'production':
+    raise RuntimeError('CORS_ORIGINS is required in production')
+
 CORS(app,
      supports_credentials=True,
-     origins=['http://localhost:3000', 'http://localhost:5173'],
-     allow_headers=['Content-Type', 'Authorization'],
+     origins=cors_origins,
+     allow_headers=['Content-Type', 'Authorization', 'X-CSRF-TOKEN'],
      methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
-# Setup admin
-setup_admin(app)
+# Setup admin only when explicitly enabled.
+if get_bool_env('ENABLE_ADMIN', False):
+    setup_admin(app, ENV)
 
 # Setup CLI commands
 setup_commands(app)
@@ -132,23 +166,32 @@ limiter.init_app(app)
 def health():
     return jsonify({"status": "ok", "message": "Backend is running"})
 
-# Debug endpoint for JWT testing
 
+@app.route('/api/ready')
+def ready():
+    try:
+        db.session.execute(text('SELECT 1'))
+        return jsonify({"status": "ready", "database": "ok"}), 200
+    except Exception as error:
+        db.session.rollback()
+        app.logger.error("Readiness check failed: %s", error)
+        return jsonify({"status": "not_ready", "database": "error"}), 503
 
-@app.route('/api/debug/token')
-def debug_token():
-    auth_header = request.headers.get('Authorization', 'NONE')
-    return jsonify({
-        "auth_header": auth_header[:80] if auth_header else 'NONE',
-        "all_headers": dict(request.headers)
-    })
+if get_bool_env('ENABLE_DEBUG_ROUTES', False):
+    # Debug endpoints for local JWT troubleshooting only.
+    @app.route('/api/debug/token')
+    def debug_token():
+        auth_header = request.headers.get('Authorization', 'NONE')
+        return jsonify({
+            "auth_header": auth_header[:80] if auth_header else 'NONE',
+            "all_headers": dict(request.headers)
+        })
 
-
-@app.route('/api/debug/protected')
-@jwt_req()
-def debug_protected():
-    user_id = get_jwt_id()
-    return jsonify({"user_id": user_id, "msg": "JWT is valid!"})
+    @app.route('/api/debug/protected')
+    @jwt_req()
+    def debug_protected():
+        user_id = get_jwt_id()
+        return jsonify({"user_id": user_id, "msg": "JWT is valid!"})
 
 # generate sitemap with all your endpoints
 

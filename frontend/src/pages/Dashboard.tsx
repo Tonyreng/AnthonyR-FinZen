@@ -8,8 +8,8 @@ import { UpcomingPaymentsCard } from '../components/UpcomingPaymentsCard';
 import { AiRecommendationsCard } from '../components/AiRecommendationsCard';
 import { useTranslation } from 'react-i18next';
 import { Typography } from '@mui/material';
-import { AxiosError } from 'axios';
-import { DashboardErrorResponse } from '../types';
+import type { AxiosError } from 'axios';
+import type { DashboardErrorResponse } from '../types';
 
 export const Dashboard = () => {
     const { data, error, isLoading, refetch, isFetching } = useDashboard();

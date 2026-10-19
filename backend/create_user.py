@@ -1,27 +1,53 @@
-from werkzeug.security import generate_password_hash
+"""Interactive development-only user creation utility."""
+
+import argparse
+from getpass import getpass
+
+from app import app
 from database import db
 from models import User
-from app import app
+from utils import validate_email, validate_password
 
-with app.app_context():
-    # Verificar si el usuario ya existe
-    existing_user = User.query.filter_by(email='tonyreng01@gmail.com').first()
-    if existing_user:
-        print('Error: User with this email already exists')
-        print(f'Existing user ID: {existing_user.id}')
-    else:
-        # Crear nuevo usuario
-        new_user = User(
-            full_name='Anthony Rengifo',
-            email='tonyreng01@gmail.com',
-            password_hash=generate_password_hash('1234'),
-            currency='USD'
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Create a FinZen user without embedding credentials in source."
+    )
+    parser.add_argument("--email", required=True)
+    parser.add_argument("--full-name", required=True)
+    parser.add_argument("--currency", default="USD")
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    email = args.email.strip().lower()
+    currency = args.currency.strip().upper()
+
+    if not validate_email(email):
+        raise SystemExit("Invalid email address.")
+    if len(currency) != 3:
+        raise SystemExit("Currency must use a three-letter code.")
+
+    password = getpass("Password: ")
+    is_valid, message = validate_password(password)
+    if not is_valid:
+        raise SystemExit(message)
+
+    with app.app_context():
+        if User.query.filter_by(email=email).first():
+            raise SystemExit("A user with this email already exists.")
+
+        user = User(
+            full_name=args.full_name.strip(),
+            email=email,
+            currency=currency,
         )
-        db.session.add(new_user)
+        user.set_password_hash(password)
+        db.session.add(user)
         db.session.commit()
-        print('✅ User created successfully!')
-        print(f'ID: {new_user.id}')
-        print(f'Full Name: {new_user.full_name}')
-        print(f'Email: {new_user.email}')
-        print(f'Currency: {new_user.currency}')
-        print(f'Created at: {new_user.created_at}')
+        print(f"Created user with id {user.id}.")
+
+
+if __name__ == "__main__":
+    main()

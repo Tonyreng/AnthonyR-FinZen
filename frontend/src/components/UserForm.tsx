@@ -1,5 +1,6 @@
-import { FormProvider, UseFormReturn } from 'react-hook-form';
-import { LoginFormInputs } from '../types';
+import { FormProvider } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
+import type { LoginFormInputs } from '../types';
 import { Box } from '@mui/material';
 import FormInput from './FormInput';
 import FormHeader from './FormHeader';

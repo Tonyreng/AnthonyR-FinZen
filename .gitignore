@@ -54,6 +54,7 @@ lerna-debug.log*
 # React / Vite
 dist/
 dist-ssr/
+*.tsbuildinfo
 *.local
 
 # Editor directories and files
@@ -88,6 +89,8 @@ pids
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov
+playwright-report/
+test-results/
 
 # nyc test coverage
 .nyc_output
@@ -139,6 +142,9 @@ jspm_packages/
 .vscode-test
 
 # Agents and skills data
+.agents/
+.claude/
+skills-lock.json
 .claude/skills/frontend-design
 .claude/skills/ui-ux-pro-max
 .claude/skills/vercel-react-best-practices

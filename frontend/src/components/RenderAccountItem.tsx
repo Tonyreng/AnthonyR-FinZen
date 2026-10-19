@@ -1,4 +1,4 @@
-import { AccountItem, AccountTypeValue } from '../types';
+import type { AccountItem, AccountTypeValue } from '../types';
 import AccountBalanceRoundedIcon from '@mui/icons-material/AccountBalanceRounded';
 import SavingsRoundedIcon from '@mui/icons-material/SavingsRounded';
 import CreditCardRoundedIcon from '@mui/icons-material/CreditCardRounded';
@@ -12,7 +12,7 @@ import ListItem from '@mui/material/ListItem';
 import Stack from '@mui/material/Stack';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { TFunction, i18n } from 'i18next';
+import type { TFunction, i18n } from 'i18next';
 
 export const accountTypeLabel: Record<
     AccountTypeValue,

@@ -20,40 +20,69 @@ def setup_commands(app):
     by typing: $ flask insert-test-users 5
     Note: 5 is the number of users to add
     """
-    @app.cli.command("insert-test-users")  # name of our command
-    @click.argument("count")  # argument of out command
-    def insert_test_users(count):
-        print("Creating test users")
-        for x in range(1, int(count) + 1):
-            user = User()
-            user.email = "test_user" + str(x) + "@test.com"
-            user.password = "123456"
-            user.is_active = True
-            db.session.add(user)
-            db.session.commit()
-            print("User: ", user.email, " created.")
+    @app.cli.command("insert-test-users")
+    @click.argument("count", type=click.IntRange(min=1, max=100))
+    @click.option("--email-prefix", default="test-user", show_default=True)
+    @click.option("--currency", default="USD", show_default=True)
+    @click.password_option(confirmation_prompt=True)
+    def insert_test_users(count, email_prefix, currency, password):
+        """Create deterministic users in a disposable development database."""
+        created = 0
+        for number in range(1, count + 1):
+            email = f"{email_prefix}-{number}@example.test".lower()
+            if User.query.filter_by(email=email).first():
+                click.echo(f"Skipping existing user: {email}")
+                continue
 
-        print("All test users created")
+            user = User(
+                full_name=f"Test User {number}",
+                email=email,
+                currency=currency.upper(),
+            )
+            user.set_password_hash(password)
+            db.session.add(user)
+            created += 1
+
+        db.session.commit()
+        click.echo(f"Created {created} test user(s).")
 
     @app.cli.command("insert-test-data")
-    def insert_test_data():
+    @click.option("--email", prompt=True, help="Owner of the generated data.")
+    @click.option(
+        "--replace",
+        is_flag=True,
+        help="Delete the owner's existing financial data before seeding.",
+    )
+    def insert_test_data(email, replace):
         """Insert mock data for testing the application"""
 
-        # Find existing user
-        user = User.query.filter_by(email="tonyreng01@gmail.com").first()
+        normalized_email = email.strip().lower()
+        user = User.query.filter_by(email=normalized_email).first()
         if not user:
-            print("❌ User tonyreng01@gmail.com not found. Please create the user first.")
-            return
+            raise click.ClickException(
+                "User not found. Create it first with backend/create_user.py."
+            )
 
-        print(f"✅ Found user: {user.full_name} ({user.email})")
+        click.echo(f"Found user: {user.full_name} ({user.email})")
 
-        # Clear existing data for this user (except the user itself)
-        Transaction.query.filter_by(user_id=user.id).delete()
-        Subscription.query.filter_by(user_id=user.id).delete()
-        Account.query.filter_by(user_id=user.id).delete()
-        Category.query.filter_by(user_id=user.id).delete()
-        db.session.commit()
-        print("🗑️  Cleared existing mock data")
+        has_existing_data = any((
+            Transaction.query.filter_by(user_id=user.id).first(),
+            Subscription.query.filter_by(user_id=user.id).first(),
+            Account.query.filter_by(user_id=user.id).first(),
+            Category.query.filter_by(user_id=user.id).first(),
+        ))
+        if has_existing_data and not replace:
+            raise click.ClickException(
+                "Existing financial data found. Re-run with --replace only on a disposable database."
+            )
+
+        if replace:
+            Transaction.query.filter_by(user_id=user.id).delete()
+            Subscription.query.filter_by(user_id=user.id).delete()
+            Account.query.filter_by(user_id=user.id).delete()
+            Category.query.filter_by(user_id=user.id).delete()
+            db.session.commit()
+            click.echo("Cleared existing mock data.")
 
         # ==================== ACCOUNTS ====================
         accounts_data = [

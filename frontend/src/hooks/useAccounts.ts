@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../api/axiosInstance';
-import { AccountsResponse, AccountItem } from '../types';
-import { UseFormReturn } from 'react-hook-form';
+import type { AccountsResponse, AccountItem } from '../types';
+import type { UseFormReturn } from 'react-hook-form';
 
 type useAccountsProps = {
     methods: UseFormReturn<AccountItem>;

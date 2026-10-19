@@ -1,65 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# Script de setup para el template fullstack
-echo "🚀 Configurando FinZen Fullstack Template..."
+readonly SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+readonly ENV_FILE="${SCRIPT_DIR}/.env"
 
-# Verificar si Docker está corriendo
-if ! docker info > /dev/null 2>&1; then
-    echo "❌ Docker no está corriendo. Por favor, inicia Docker Desktop."
+log() {
+    printf '[finzen-setup] %s\n' "$*"
+}
+
+fail() {
+    printf '[finzen-setup] ERROR: %s\n' "$*" >&2
     exit 1
-fi
+}
 
-echo "✅ Docker está corriendo"
+command -v docker >/dev/null 2>&1 || fail 'Docker is not installed.'
+docker info >/dev/null 2>&1 || fail 'Docker is not running.'
+docker compose version >/dev/null 2>&1 || fail 'Docker Compose v2 is required.'
+[[ -f "$ENV_FILE" ]] || fail 'Create .env from .env.example and replace every placeholder.'
 
-# Construir y ejecutar contenedores
-echo "🏗️ Construyendo contenedores..."
-docker-compose build
+cd -- "$SCRIPT_DIR"
+log 'Validating Compose configuration.'
+docker compose config --quiet
 
-echo "🚀 Iniciando servicios..."
-docker-compose up -d
+log 'Building and starting FinZen. The migrate service applies database migrations.'
+docker compose up --build --wait
 
-# Esperar a que los servicios estén listos
-echo "⏳ Esperando a que los servicios estén listos..."
-sleep 10
-
-# Ejecutar migraciones
-echo "📊 Ejecutando migraciones de base de datos..."
-docker-compose exec backend flask db upgrade
-
-# Crear usuario de prueba
-echo "👤 Creando usuario de prueba..."
-docker-compose exec backend python -c "
-from app import app
-from models import db, User
-from utils import hash_password
-with app.app_context():
-    if not User.query.filter_by(email='admin@example.com').first():
-        user = User(
-            email='admin@example.com', 
-            password=hash_password('admin123'), 
-            is_active=True
-        )
-        db.session.add(user)
-        db.session.commit()
-        print('✅ Usuario admin@example.com creado con password: admin123')
-    else:
-        print('ℹ️ Usuario admin ya existe')
-"
-
-echo ""
-echo "🎉 ¡Setup completado!"
-echo ""
-echo "📍 URLs disponibles:"
-echo "   Frontend: http://localhost:3000"
-echo "   Backend:  http://localhost:5001/api/health"
-echo "   Admin:    http://localhost:5001/admin/"
-echo ""
-echo "👤 Usuario de prueba:"
-echo "   Email:    admin@example.com"
-echo "   Password: admin123"
-echo ""
-echo "🛠️ Comandos útiles:"
-echo "   Ver logs:     docker-compose logs -f"
-echo "   Parar todo:   docker-compose down"
-echo "   Reiniciar:    docker-compose restart"
-echo ""
+log 'FinZen is ready at http://localhost:${FRONTEND_PORT:-3000}'

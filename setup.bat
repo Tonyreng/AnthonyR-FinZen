@@ -1,51 +1,34 @@
 @echo off
-REM Script de setup para Windows
+setlocal EnableExtensions
 
-echo 🚀 Configurando FinZen Fullstack Template...
-
-REM Verificar si Docker está corriendo
-docker info >nul 2>&1
-if %ERRORLEVEL% neq 0 (
-    echo ❌ Docker no está corriendo. Por favor, inicia Docker Desktop.
+where docker >nul 2>&1 || (
+    echo [finzen-setup] ERROR: Docker is not installed.
     exit /b 1
 )
 
-echo ✅ Docker está corriendo
+docker info >nul 2>&1 || (
+    echo [finzen-setup] ERROR: Docker is not running.
+    exit /b 1
+)
 
-REM Construir y ejecutar contenedores
-echo 🏗️ Construyendo contenedores...
-docker-compose build
+docker compose version >nul 2>&1 || (
+    echo [finzen-setup] ERROR: Docker Compose v2 is required.
+    exit /b 1
+)
 
-echo 🚀 Iniciando servicios...
-docker-compose up -d
+if not exist "%~dp0.env" (
+    echo [finzen-setup] ERROR: Create .env from .env.example and replace every placeholder.
+    exit /b 1
+)
 
-REM Esperar a que los servicios estén listos
-echo ⏳ Esperando a que los servicios estén listos...
-timeout /t 10 /nobreak >nul
+pushd "%~dp0" || exit /b 1
+docker compose config --quiet || goto :error
+docker compose up --build --wait || goto :error
+echo [finzen-setup] FinZen is ready at http://localhost:3000
+popd
+exit /b 0
 
-REM Ejecutar migraciones
-echo 📊 Ejecutando migraciones de base de datos...
-docker-compose exec backend flask db upgrade
-
-REM Crear usuario de prueba
-echo 👤 Creando usuario de prueba...
-docker-compose exec backend python -c "from app import app; from models import db, User; from utils import hash_password; app.app_context().push(); user = User.query.filter_by(email='admin@example.com').first() or User(email='admin@example.com', password=hash_password('admin123'), is_active=True); db.session.add(user) if not User.query.filter_by(email='admin@example.com').first() else None; db.session.commit(); print('✅ Usuario admin@example.com configurado')"
-
-echo.
-echo 🎉 ¡Setup completado!
-echo.
-echo 📍 URLs disponibles:
-echo    Frontend: http://localhost:3000
-echo    Backend:  http://localhost:5001/api/health
-echo    Admin:    http://localhost:5001/admin/
-echo.
-echo 👤 Usuario de prueba:
-echo    Email:    admin@example.com
-echo    Password: admin123
-echo.
-echo 🛠️ Comandos útiles:
-echo    Ver logs:     docker-compose logs -f
-echo    Parar todo:   docker-compose down
-echo    Reiniciar:    docker-compose restart
-echo.
-pause
+:error
+echo [finzen-setup] ERROR: Setup failed.
+popd
+exit /b 1

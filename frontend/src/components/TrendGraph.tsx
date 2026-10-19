@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
-import { TrendChartTypes } from '../types';
+import type { TrendChartTypes } from '../types';
 
 type Props = {
     trendChartData?: TrendChartTypes[];

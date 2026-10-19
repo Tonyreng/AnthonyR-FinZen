@@ -1,5 +1,5 @@
 import { api } from '../api/axiosInstance';
-import { SmallUser } from '../types';
+import type { SmallUser } from '../types';
 
 type RefreshResponse = {
     access_token: string;
@@ -8,7 +8,9 @@ type RefreshResponse = {
 
 export const initAuthServices = async (): Promise<SmallUser | null> => {
     try {
-        const { data } = await api.post<RefreshResponse>('api/user/refresh_token');
+        const { data } = await api.post<RefreshResponse>(
+            '/api/user/refresh_token'
+        );
         window.__ACCESS_TOKEN__ = data.access_token;
         return data.user;
     } catch {
@@ -19,7 +21,7 @@ export const initAuthServices = async (): Promise<SmallUser | null> => {
 
 export const logoutService = async (): Promise<void> => {
     try {
-        await api.post('api/user/logout');
+        await api.post('/api/user/logout');
     } catch {
         console.error('Failed to logout from server session');
     }

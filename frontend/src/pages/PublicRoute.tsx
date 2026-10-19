@@ -1,10 +1,10 @@
 import { Navigate } from 'react-router-dom';
 import useGlobalReducer from '../hooks/useGlobalReducer';
 import { FullScreenLoader } from './FullScreenLoader';
-import { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 type Props = {
-    children: React.ReactNode;
+    children: ReactNode;
 };
 
 export const PublicRoute = ({ children }: Props): JSX.Element => {

@@ -18,14 +18,14 @@ limiter = Limiter(
 @limiter.limit("5 per minute")
 def login():
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         email = data.get("email", "").strip().lower()
         password = data.get("password")
         remember_me = data.get("rememberMe")
         expires = timedelta(days=30) if remember_me else timedelta(hours=6)
 
-        if not data or not email or not password:
-            logging.warning(f"Login attempt with missing credentials.")
+        if not email or not password:
+            logging.warning("Login attempt with missing credentials.")
             return jsonify({"msg": "Missing email or password"}), 400
 
         user = User.query.filter_by(email=email).first()

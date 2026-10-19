@@ -1,5 +1,5 @@
 import { Box, Typography, Stack } from '@mui/material';
-import { UpcomingPaymentsTypes } from '../types';
+import type { UpcomingPaymentsTypes } from '../types';
 import { UpcomingPaymentItem } from './UpcomingPaymentItem';
 import { useTranslation } from 'react-i18next';
 

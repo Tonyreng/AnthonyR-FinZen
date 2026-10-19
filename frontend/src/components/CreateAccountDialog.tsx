@@ -12,9 +12,10 @@ import {
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import ChevronRightRoundedIcon from '@mui/icons-material/ChevronRightRounded';
-import { AccountItem, AccountTypeValue } from '../types';
+import type { AccountItem, AccountTypeValue } from '../types';
 import { accountTypeLabel, getAccountIcon } from './RenderAccountItem';
-import { Controller, FormProvider, UseFormReturn } from 'react-hook-form';
+import { Controller, FormProvider } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
 import { useRef } from 'react';
 import FormInput from './FormInput';
 import FormButton from './FormButton';

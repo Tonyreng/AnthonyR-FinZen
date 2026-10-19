@@ -1,10 +1,13 @@
 import axios from 'axios';
 
-const backendUrl = import.meta.env.VITE_API_URL;
+const backendUrl = import.meta.env.VITE_API_URL || window.location.origin;
 
 export const api = axios.create({
     baseURL: backendUrl,
     withCredentials: true,
+    withXSRFToken: true,
+    xsrfCookieName: 'csrf_refresh_token',
+    xsrfHeaderName: 'X-CSRF-TOKEN',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -36,7 +39,12 @@ api.interceptors.response.use(
                 const { data } = await axios.post(
                     `${backendUrl}/api/user/refresh_token`,
                     {},
-                    { withCredentials: true }
+                    {
+                        withCredentials: true,
+                        withXSRFToken: true,
+                        xsrfCookieName: 'csrf_refresh_token',
+                        xsrfHeaderName: 'X-CSRF-TOKEN',
+                    }
                 );
                 window.__ACCESS_TOKEN__ = data.access_token;
                 originalRequest.headers.Authorization = `Bearer ${data.access_token}`;

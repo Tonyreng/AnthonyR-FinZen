@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import UserForm from '../components/UserForm';
-import { LoginFormInputs } from '../types';
+import type { LoginFormInputs } from '../types';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 import { Box } from '@mui/material';

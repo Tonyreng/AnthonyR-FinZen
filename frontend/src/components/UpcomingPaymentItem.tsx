@@ -5,7 +5,7 @@ import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import YouTubeIcon from '@mui/icons-material/YouTube';
-import { JSX } from 'react';
+import type { JSX } from 'react';
 
 const iconMap: Record<string, JSX.Element> = {
     calendar: <CalendarMonthIcon />,
