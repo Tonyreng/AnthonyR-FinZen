@@ -26,7 +26,9 @@
             "title": "Dashboard Overview",
             "paragraph": "Here's a snapshot of your financial health.",
             "loading": "Loading dashboard...",
-            "error": "We couldn't load your dashboard data right now."
+            "error": "We couldn't load your dashboard data right now.",
+            "retry": "Retry",
+            "errorDetails": "Technical detail: {{message}}"
         },
         "cards": {
             "totalBalance": "Total Balance",
@@ -135,10 +137,63 @@
             "other": "Other"
         }
     },
+    "transactions": {
+        "page": {
+            "title": "Transactions",
+            "addTransaction": "New Transaction",
+            "loading": "Loading transactions...",
+            "empty": "No transactions found with the selected filters.",
+            "requiresAccount": "Create at least one account before adding a transaction."
+        },
+        "filters": {
+            "searchPlaceholder": "Search transactions...",
+            "category": "Category",
+            "date": "Date",
+            "type": "Type",
+            "allCategories": "All Categories",
+            "allDates": "All Dates",
+            "allTypes": "All Types"
+        },
+        "table": {
+            "date": "DATE",
+            "description": "DESCRIPTION",
+            "amount": "AMOUNT",
+            "category": "CATEGORY",
+            "account": "ACCOUNT"
+        },
+        "types": {
+            "expense": "Expense",
+            "income": "Income"
+        },
+        "dialog": {
+            "title": "New Transaction",
+            "fields": {
+                "amount": "Amount",
+                "category": "Category",
+                "date": "Date",
+                "description": "Description"
+            },
+            "actions": {
+                "create": "Add Transaction",
+                "creating": "Adding..."
+            },
+            "validation": {
+                "amountRequired": "Amount is required",
+                "categoryRequired": "Category is required",
+                "dateRequired": "Date is required",
+                "descriptionRequired": "Description is required",
+                "descriptionMinLength": "Description must be at least 3 characters"
+            },
+            "aria": {
+                "closeDialog": "Close dialog"
+            }
+        }
+    },
     "navbar": {
         "navItems": {
             "overview": "Overview",
             "accounts": "Accounts",
+            "transactions": "Transactions",
             "subscriptions": "Subscriptions",
             "debts": "Debts",
             "reports": "Reports"

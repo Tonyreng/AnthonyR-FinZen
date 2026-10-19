@@ -1,18 +1,26 @@
+import { lazy } from 'react';
 import {
     createBrowserRouter,
     createRoutesFromElements,
     Route,
 } from 'react-router-dom';
 import { Layout } from './pages/Layout';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
 import { ErrorDetail } from './pages/ErrorDetail';
-import { Dashboard } from './pages/Dashboard';
-import { Accounts } from './pages/Accounts';
-import { Transactions } from './pages/Transactions';
 import { ProtectedRoute } from './pages/ProtectedRoute';
 import { PublicRoute } from './pages/PublicRoute';
+
+const Home = lazy(() => import('./pages/Home'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const Dashboard = lazy(() =>
+    import('./pages/Dashboard').then(({ Dashboard }) => ({ default: Dashboard }))
+);
+const Accounts = lazy(() =>
+    import('./pages/Accounts').then(({ Accounts }) => ({ default: Accounts }))
+);
+const Transactions = lazy(() =>
+    import('./pages/Transactions').then(({ Transactions }) => ({ default: Transactions }))
+);
 
 export const router = createBrowserRouter(
     createRoutesFromElements(

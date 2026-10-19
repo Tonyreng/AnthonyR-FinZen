@@ -5,11 +5,7 @@ import { useEffect, useState } from 'react';
 import { FullScreenLoader } from './FullScreenLoader';
 import { Navbar } from '../components/Navbar';
 
-type Props = {
-    children?: React.ReactNode;
-};
-
-export const Layout = ({ children }: Props) => {
+export const Layout = () => {
     const { dispatch } = useGlobalReducer();
     const [loading, setLoading] = useState(true);
 
@@ -26,7 +22,7 @@ export const Layout = ({ children }: Props) => {
             setLoading(false);
         };
         bootstrapAsync();
-    }, []);
+    }, [dispatch]);
 
     if (loading) {
         return <FullScreenLoader />;

@@ -80,3 +80,65 @@ export type AccountItem = {
 export type AccountsResponse = {
     accounts: AccountItem[];
 };
+
+export type CategoryTypeValue = 'income' | 'expense';
+
+export type TransactionCategoryItem = {
+    id: number;
+    user_id: number;
+    name: string;
+    type: CategoryTypeValue;
+};
+
+export type TransactionItem = {
+    id: number;
+    account_id: number;
+    user_id: number;
+    category_id: number;
+    subscription_id: number | null;
+    type: 'general' | 'subscription' | 'debt_payment' | 'loan_payment';
+    amount: string;
+    description: string | null;
+    date: string;
+    is_recurring: boolean;
+    account?: AccountItem;
+    category?: TransactionCategoryItem;
+};
+
+export type TransactionsResponse = {
+    transactions: TransactionItem[];
+};
+
+export type CategoriesResponse = {
+    categories: TransactionCategoryItem[];
+};
+
+export type TransactionFilterType = 'all' | CategoryTypeValue;
+
+export type TransactionFilters = {
+    search: string;
+    categoryId: string;
+    date: string;
+    type: TransactionFilterType;
+};
+
+export type CreateTransactionFormValues = {
+    category_type: CategoryTypeValue;
+    amount: string;
+    category_id: string;
+    date: string;
+    description: string;
+};
+
+export type CreateTransactionPayload = {
+    amount: string;
+    category_id: number;
+    date: string;
+    description?: string;
+    category_type: CategoryTypeValue;
+    account_id: number;
+};
+
+export type DashboardErrorResponse = {
+    msg?: string;
+};

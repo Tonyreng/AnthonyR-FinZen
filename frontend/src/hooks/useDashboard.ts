@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/axiosInstance';
-import { DashboardResponse } from '../types';
+import type { DashboardResponse } from '../types';
 
 export const useDashboard = () => {
     return useQuery({

@@ -26,7 +26,9 @@
             "title": "Panel de Resumen",
             "paragraph": "Aquí tienes una vista general de tu salud financiera.",
             "loading": "Cargando panel...",
-            "error": "No pudimos cargar la información del panel en este momento."
+            "error": "No pudimos cargar la información del panel en este momento.",
+            "retry": "Reintentar",
+            "errorDetails": "Detalle técnico: {{message}}"
         },
         "cards": {
             "totalBalance": "Balance total",
@@ -135,10 +137,63 @@
             "other": "Otra"
         }
     },
+    "transactions": {
+        "page": {
+            "title": "Transacciones",
+            "addTransaction": "Nueva Transacción",
+            "loading": "Cargando transacciones...",
+            "empty": "No se encontraron transacciones con los filtros seleccionados.",
+            "requiresAccount": "Crea al menos una cuenta antes de agregar una transacción."
+        },
+        "filters": {
+            "searchPlaceholder": "Buscar transacciones...",
+            "category": "Categoría",
+            "date": "Fecha",
+            "type": "Tipo",
+            "allCategories": "Todas las Categorías",
+            "allDates": "Todas las Fechas",
+            "allTypes": "Todos los Tipos"
+        },
+        "table": {
+            "date": "FECHA",
+            "description": "DESCRIPCIÓN",
+            "amount": "MONTO",
+            "category": "CATEGORÍA",
+            "account": "CUENTA"
+        },
+        "types": {
+            "expense": "Gasto",
+            "income": "Ingreso"
+        },
+        "dialog": {
+            "title": "Nueva Transacción",
+            "fields": {
+                "amount": "Monto",
+                "category": "Categoría",
+                "date": "Fecha",
+                "description": "Descripción"
+            },
+            "actions": {
+                "create": "Agregar Transacción",
+                "creating": "Agregando..."
+            },
+            "validation": {
+                "amountRequired": "El monto es obligatorio",
+                "categoryRequired": "La categoría es obligatoria",
+                "dateRequired": "La fecha es obligatoria",
+                "descriptionRequired": "La descripción es obligatoria",
+                "descriptionMinLength": "La descripción debe tener al menos 3 caracteres"
+            },
+            "aria": {
+                "closeDialog": "Cerrar diálogo"
+            }
+        }
+    },
     "navbar": {
         "navItems": {
             "overview": "Resumen",
             "accounts": "Cuentas",
+            "transactions": "Transacciones",
             "subscriptions": "Suscripciones",
             "debts": "Deudas",
             "reports": "Reportes"
