@@ -2,7 +2,7 @@
 
 ## Requisitos y configuración
 
-La ruta soportada usa Git, Docker Engine/Desktop y Compose v2. La ejecución nativa requiere Python 3.11, Node 20, pnpm 10.28.2 y PostgreSQL 15. SQLite solo sirve para pruebas pequeñas: el dashboard usa `date_trunc` de PostgreSQL.
+La ruta soportada usa Git, Docker Engine/Desktop y Compose v2. La ejecución nativa requiere Python 3.11, Node 24, pnpm 10.28.2 y PostgreSQL 15. SQLite solo sirve para pruebas pequeñas: el dashboard usa `date_trunc` de PostgreSQL.
 
 ```bash
 cp .env.example .env
