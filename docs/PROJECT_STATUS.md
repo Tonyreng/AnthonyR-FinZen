@@ -53,7 +53,7 @@ Pendiente para considerar producción real:
 
 ### Fase 2 — separación de repositorios
 
-Se ejecutará únicamente desde clones limpios del tag `monolith-pre-split-v1`, después de que la Fase 1 esté confirmada. Los destinos son `AnthonyR-FinZen-frontend`, `AnthonyR-FinZen-backend` y `AnthonyR-FinZen-infra`. No deben existir imports ni copias cruzadas; la integración será HTTP y contratos de imágenes/configuración.
+Ejecutada localmente desde clones limpios del tag `monolith-pre-split-v1` con `git-filter-repo`. Los repositorios hermanos `AnthonyR-FinZen-frontend`, `AnthonyR-FinZen-backend` y `AnthonyR-FinZen-infra` conservan el historial relevante, se construyen de forma aislada y pasaron el smoke integrado. Falta crear/publicar los remotos y observar CI porque GitHub CLI no está instalado/autenticado en este entorno.
 
 ### Fase 3 — Django v2
 
@@ -105,6 +105,6 @@ Los resultados son una fotografía local; CI debe confirmarlos desde un clon lim
 
 1. Publicar la rama/tag, ejecutar CI y corregir cualquier diferencia del runner Linux/GHCR.
 2. Añadir pruebas PostgreSQL de autorización y concurrencia antes de declarar la Fase 1 cerrada.
-3. Crear clones limpios, ejecutar `git-filter-repo`, adaptar cada raíz y validar los tres repositorios.
+3. Crear y publicar los tres repositorios GitHub y validar sus workflows.
 4. Archivar el monorepo solo cuando frontend, backend e infraestructura funcionen aislados y el rollback esté documentado.
 5. Diseñar y aprobar OpenAPI v2 antes de iniciar Django.

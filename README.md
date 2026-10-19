@@ -2,6 +2,8 @@
 
 FinZen es una aplicación web para organizar las finanzas personales y observar su evolución. Permite autenticar usuarios, administrar cuentas, registrar ingresos y gastos y consultar un panel con saldos, tendencias, próximos pagos y recomendaciones financieras basadas en reglas.
 
+> Transición de repositorios: esta línea monolítica queda preservada en `monolith-pre-split-v1`. Ya existen clones locales con historial filtrado para frontend, backend e infraestructura; todavía no se han publicado ni se ha archivado este remoto.
+
 > Estado actual: el núcleo de autenticación, cuentas, transacciones y dashboard está implementado. Registro, suscripciones, deudas, préstamos, reportes y notificaciones todavía no tienen un flujo completo de producto. Consulta [Estado del proyecto](docs/PROJECT_STATUS.md) antes de ampliar una funcionalidad.
 
 ## Documentación
