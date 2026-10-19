@@ -16,6 +16,10 @@ COPY frontend/ ./
 EXPOSE 5173
 CMD ["pnpm", "dev", "--host", "0.0.0.0"]
 
+FROM dependencies AS test
+COPY frontend/ ./
+CMD ["pnpm", "test:run"]
+
 FROM dependencies AS build
 ARG VITE_API_URL=""
 ENV VITE_API_URL=$VITE_API_URL
