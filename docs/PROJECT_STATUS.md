@@ -46,7 +46,7 @@ Implementado:
 
 Pendiente para considerar producción real:
 
-- Ejecutar y observar las nuevas workflows en GitHub; la validación local no prueba permisos de GHCR.
+- Probar la workflow de publicación con un tag semántico; la CI de rama ya pasó, pero no se publicaron imágenes GHCR.
 - Ampliar tests de permisos, cálculos, migraciones, concurrencia y fallos de PostgreSQL.
 - Probar cookies `Secure`, HTTPS, CSP/HSTS y rollback en el proxy/host real.
 - Auditar dependencias Python y definir política de actualización de imágenes base.
@@ -98,6 +98,7 @@ No iniciada intencionalmente. Flask v1 debe permanecer como rollback mientras Dj
 | Refresh CSRF | Con token `200`; sin encabezado `401`. |
 | Persistencia PostgreSQL | Usuario de smoke conservado tras recrear contenedores sin borrar volumen. |
 | Playwright contra Docker | **1 passed**. |
+| GitHub Actions en `recovery/docker-stabilization` | **Correcta** en backend, frontend y smoke Docker tras alinear Node 24. |
 
 Los resultados son una fotografía local; CI debe confirmarlos desde un clon limpio. El volumen usado en smoke contiene solo datos descartables de prueba y no debe confundirse con datos productivos.
 
