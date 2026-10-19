@@ -27,7 +27,7 @@ La navegación aún contiene destinos simulados y la raíz conserva contenido de
 - Respaldo privado verificable creado fuera del repositorio: archivo del workspace incluyendo `.git` y `.env`, más `git bundle` completo de las referencias.
 - Working tree preservado; solo se restableció el índice para recuperar un `HEAD` válido.
 - `__pycache__`, `*.pyc` y `*.tsbuildinfo` dejaron de estar rastreados y están ignorados.
-- Pendiente al cerrar esta fase: confirmar los cambios en commits temáticos, dejar el árbol limpio y crear `monolith-pre-split-v1`.
+- Los cambios quedaron organizados en commits temáticos, el árbol quedó limpio y se creó el punto recuperable `monolith-pre-split-v1`.
 
 ### Fase 1 — Docker reproducible
 
@@ -103,9 +103,8 @@ Los resultados son una fotografía local; CI debe confirmarlos desde un clon lim
 
 ## Próximos pasos recomendados
 
-1. Confirmar cambios en commits separados y crear `monolith-pre-split-v1` con árbol limpio.
-2. Publicar la rama, ejecutar CI y corregir cualquier diferencia del runner Linux/GHCR.
-3. Añadir pruebas PostgreSQL de autorización y concurrencia antes de declarar la Fase 1 cerrada.
-4. Crear clones limpios, ejecutar `git-filter-repo`, adaptar cada raíz y validar los tres repositorios.
-5. Archivar el monorepo solo cuando frontend, backend e infraestructura funcionen aislados y el rollback esté documentado.
-6. Diseñar y aprobar OpenAPI v2 antes de iniciar Django.
+1. Publicar la rama/tag, ejecutar CI y corregir cualquier diferencia del runner Linux/GHCR.
+2. Añadir pruebas PostgreSQL de autorización y concurrencia antes de declarar la Fase 1 cerrada.
+3. Crear clones limpios, ejecutar `git-filter-repo`, adaptar cada raíz y validar los tres repositorios.
+4. Archivar el monorepo solo cuando frontend, backend e infraestructura funcionen aislados y el rollback esté documentado.
+5. Diseñar y aprobar OpenAPI v2 antes de iniciar Django.
