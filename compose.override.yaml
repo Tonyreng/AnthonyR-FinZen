@@ -30,7 +30,7 @@ services:
             target: development
         environment:
             VITE_API_URL: ${VITE_API_URL:-http://localhost:5001}
-        ports:
+        ports: !override
             - '${FRONTEND_PORT:-3000}:5173'
         volumes:
             - ./frontend:/app
