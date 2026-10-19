@@ -1,288 +1,160 @@
-# Fullstack Template
+# FinZen
 
-Un template completo para aplicaciones fullstack con React (TypeScript) + Flask (Python) + PostgreSQL.
+FinZen es una aplicación web para organizar las finanzas personales y observar su evolución. Permite autenticar usuarios, administrar cuentas, registrar ingresos y gastos y consultar un panel con saldos, tendencias, próximos pagos y recomendaciones financieras basadas en reglas.
 
-## 🏗️ Estructura del Proyecto
+> Estado actual: el núcleo de autenticación, cuentas, transacciones y dashboard está implementado. Registro, suscripciones, deudas, préstamos, reportes y notificaciones todavía no tienen un flujo completo de producto. Consulta [Estado del proyecto](docs/PROJECT_STATUS.md) antes de ampliar una funcionalidad.
 
-````
-my-fullstack-template/
-├── frontend## 🔥 Funcionalidades de Autenticación
+## Documentación
 
-### Frontend
-- **Servicio API centralizado** (`services/api.ts`) con interceptores automáticos
-- **Componente Login** (`components/Login.tsx`) con manejo de estados
-- **Interceptores JWT** que añaden automáticamente el token a todas las peticiones
-- **Manejo automático de tokens expirados** con redirección al login
+- [Guía para agentes](AGENTS.md): reglas de trabajo, convenciones y validaciones.
+- [Arquitectura](docs/ARCHITECTURE.md): componentes, flujos y modelo de datos.
+- [Referencia de la API](docs/API.md): endpoints y contratos existentes.
+- [Desarrollo y despliegue](docs/DEVELOPMENT.md): instalación, configuración y operaciones.
+- [Estado del proyecto](docs/PROJECT_STATUS.md): capacidades, deuda técnica y prioridades.
 
-### Backend
-- **Rutas de autenticación** configuradas en `routes/auth.py`
-- **Middleware JWT** para proteger rutas
-- **Modelos de usuario** con hash de contraseñas
+## Funcionalidades disponibles
 
-### 🚀 Ejemplos de Uso
+- Inicio y cierre de sesión con access token JWT en memoria y refresh token en cookie.
+- Restauración de sesión al cargar la aplicación.
+- Listado y creación de cuentas financieras.
+- Listado, filtrado y creación de transacciones de ingreso o gasto.
+- Actualización del balance de la cuenta al crear una transacción.
+- Dashboard con balance total, ingresos, gastos, tendencias y próximos pagos.
+- Recomendaciones financieras deterministas según los datos del usuario.
+- Interfaz en español e inglés.
+- Panel Flask-Admin opcional, protegido con autenticación básica cuando se habilita.
 
-#### Usar el servicio de autenticación
+## Tecnologías
 
-```typescript
-import { authService } from './services/api';
+| Área | Tecnologías principales |
+| --- | --- |
+| Frontend | React 19, TypeScript, Vite, Material UI, React Router, TanStack Query, Axios, React Hook Form, i18next, Recharts |
+| Backend | Python 3.11, Flask 3, SQLAlchemy 2, Flask-Migrate, Flask-JWT-Extended, Flask-Limiter, Flask-Admin |
+| Datos | PostgreSQL 15 y migraciones Alembic |
+| Infraestructura | Docker Compose y Nginx |
 
-// Login
-const response = await authService.login('user@email.com', 'password');
-localStorage.setItem('token', response.access_token);
+## Inicio rápido con Docker
 
-// Las peticiones posteriores incluirán automáticamente el token
-const users = await userService.getUsers(); // Token incluido automáticamente
-````
-
-#### Usar el componente Login
-
-````tsx
-import Login from './components/Login';
-
-function App() {
-  const handleLogin = (token: string) => {
-    console.log('Usuario autenticado:', token);
-    // Redirigir o actualizar estado de la app
-  };
-
-  return <Login onLogin={handleLogin} />;
-}
-```      # React + TypeScript + Vite
-│   ├── src/
-│   │   ├── components/      # Componentes React
-│   │   │   └── Login.tsx    # Componente de login con JWT
-│   │   ├── services/        # Servicios API
-│   │   │   └── api.ts       # Cliente HTTP con interceptores
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── assets/
-│   ├── public/
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── vite.config.ts
-│   └── Dockerfile
-├── backend/                  # Flask + SQLAlchemy + PostgreSQL
-│   ├── app.py               # Aplicación Flask principal
-│   ├── models.py            # Modelos de base de datos
-│   ├── database.py          # Configuración de base de datos
-│   ├── admin.py             # Panel de administración
-│   ├── routes/              # Rutas de la API
-│   │   ├── auth.py
-│   │   └── users.py
-│   ├── migrations/          # Migraciones de base de datos
-│   ├── requirements.txt     # Dependencias Python
-│   ├── .env                 # Variables de entorno
-│   └── Dockerfile
-└── docker-compose.yml       # Orquestación de servicios
-````
-
-## 🚀 Inicio Rápido
-
-### Prerequisitos
-
-- Docker y Docker Compose
-- Python 3.11+ (para desarrollo local)
-- Node.js 20+ y pnpm (para desarrollo local)
-
-### 1. Clonar el repositorio
+Requisitos: Docker con Compose v2 y Git.
 
 ```bash
-git clone https://github.com/Tonyreng/AnthonyR-fullstack-template.git
-cd AnthonyR-fullstack-template
+cp .env.example .env
 ```
 
-### 2. Ejecutar con Docker
+Edita `.env` y reemplaza todos los valores de ejemplo, especialmente las claves y credenciales. Después inicia el entorno de desarrollo:
 
 ```bash
-# Construir y ejecutar todos los servicios
-docker-compose up --build
-
-# En modo detached (segundo plano)
-docker-compose up -d
+docker compose up --build --wait
 ```
 
-### 3. Acceder a las aplicaciones
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5001/api/health
-- **Admin Panel**: http://localhost:5001/admin/
-
-## 🛠️ Desarrollo Local
-
-### Backend (Flask)
+Compose combina automáticamente `compose.yaml` con `compose.override.yaml`: PostgreSQL queda saludable, el servicio one-shot `migrate` aplica Alembic y luego arrancan Flask con hot reload y Vite. Para simular producción usa únicamente el archivo base:
 
 ```bash
-cd backend
-
-# Crear entorno virtual
-python -m venv venv
-venv\Scripts\activate  # Windows
-# source venv/bin/activate  # Linux/Mac
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Configurar base de datos
-flask db upgrade
-
-# Ejecutar servidor
-python app.py
+docker compose -f compose.yaml up --build --wait
 ```
 
-### Frontend (React)
+Servicios disponibles:
+
+- Frontend: <http://localhost:3000>
+- API: <http://localhost:5001/api/health>
+- PostgreSQL: `localhost:5432`
+- Administración: <http://localhost:5001/admin/> solo si `ENABLE_ADMIN=true`
+
+El stack de producción local usa Nginx y publica el frontend en <http://localhost:3000>. Las llamadas a `/api` se envían internamente al backend:
+
+Las migraciones se ejecutan automáticamente antes del backend. Los reinicios conservan datos en `postgres_data`.
+
+## Desarrollo sin Docker
+
+La base de datos soportada para el flujo completo es PostgreSQL. Aunque Flask configura SQLite cuando falta `DATABASE_URL`, el dashboard utiliza funciones específicas de PostgreSQL como `date_trunc`.
+
+Backend:
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+export FLASK_APP=backend/app.py
+flask db upgrade --directory backend/migrations
+flask run --host=127.0.0.1 --port=5001
+```
+
+Frontend:
 
 ```bash
 cd frontend
-
-# Instalar dependencias
-pnpm install
-
-# Ejecutar en modo desarrollo
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-## 📊 Base de Datos
+Para una configuración local completa y las diferencias entre entornos consulta [Desarrollo y despliegue](docs/DEVELOPMENT.md).
 
-### Migraciones
+## Variables de entorno
 
-```bash
-# Crear nueva migración
-flask db migrate -m "descripción del cambio"
+La referencia versionada es [.env.example](.env.example). No confirmes `.env` ni valores reales.
 
-# Aplicar migraciones localmente
-flask db upgrade
+| Variable | Propósito |
+| --- | --- |
+| `FLASK_DEBUG` | Activa el modo de desarrollo cuando vale `1`. |
+| `DATABASE_URL` | Conexión SQLAlchemy; en Docker apunta al servicio `db`. |
+| `JWT_SECRET_KEY` | Firma los JWT; debe ser aleatoria y secreta. |
+| `JWT_COOKIE_SECURE` | Exige HTTPS para enviar la refresh cookie. |
+| `JWT_COOKIE_CSRF_PROTECT` | Activa la protección CSRF de cookies JWT. |
+| `JWT_COOKIE_SAMESITE` | Política SameSite de la cookie. |
+| `CORS_ORIGINS` | Orígenes permitidos, separados por comas. |
+| `ENABLE_ADMIN` | Habilita Flask-Admin explícitamente. |
+| `FLASK_APP_KEY` | Clave de sesión de Flask usada por el admin. |
+| `ADMIN_USERNAME` / `ADMIN_PASSWORD` | Credenciales de autenticación básica del admin. |
+| `ENABLE_DEBUG_ROUTES` | Habilita endpoints de diagnóstico JWT; solo para desarrollo. |
+| `VITE_API_URL` | URL del backend para el navegador; vacío usa el mismo origen. |
 
-# Aplicar migraciones en Docker
-docker-compose exec backend flask db upgrade
-```
+En Docker también se requieren `POSTGRES_USER`, `POSTGRES_PASSWORD` y `POSTGRES_DB`. En producción se requieren `JWT_SECRET_KEY` y `CORS_ORIGINS`; si se habilita el admin también hacen falta `FLASK_APP_KEY`, `ADMIN_USERNAME` y `ADMIN_PASSWORD`. El frontend envía el token CSRF de doble envío para renovar la sesión.
 
-### Modelos incluidos
+## Migraciones y datos de desarrollo
 
-- **User**: Modelo básico de usuario con email, password e is_active
-
-## 🔧 Tecnologías Incluidas
-
-### Frontend
-
-- **React 19.1** - Framework UI
-- **TypeScript** - Tipado estático
-- **Vite** - Build tool y dev server
-- **Axios** - Cliente HTTP con interceptores JWT
-- **React Router** - Enrutamiento
-- **ESLint** - Linting
-- **JWT Authentication** - Sistema de autenticación implementado
-
-### Backend
-
-- **Flask 3.1** - Framework web
-- **SQLAlchemy 2.0** - ORM
-- **Flask-Migrate** - Migraciones de DB
-- **Flask-Admin** - Panel de administración
-- **Flask-CORS** - Manejo de CORS
-- **Flask-JWT-Extended** - Autenticación JWT
-- **PostgreSQL** - Base de datos
-- **python-dotenv** - Variables de entorno
-
-### DevOps
-
-- **Docker** - Containerización
-- **Docker Compose** - Orquestación
-- **Nginx** - Servidor web para frontend
-
-## 🌍 Variables de Entorno
-
-### Backend (.env)
-
-```env
-# Base de datos (comentado para desarrollo local con SQLite)
-# DATABASE_URL=postgresql://user:pass@db:5432/dbname
-
-# JWT Secret
-JWT_SECRET_KEY=tu-secret-key-aqui
-```
-
-### Docker (docker-compose.yml)
-
-- `DATABASE_URL`: postgresql://postgres:postgres@db:5432/appdb
-- `JWT_SECRET_KEY`: super-secret
-
-## 📋 Scripts Útiles
-
-### Docker
+Con Docker de desarrollo:
 
 ```bash
-# Ver logs
-docker-compose logs [servicio]
-
-# Ejecutar comandos en contenedores
-docker-compose exec backend flask db upgrade
-docker-compose exec backend python -c "from app import app; print('OK')"
-
-# Limpiar todo
-docker-compose down -v
-docker system prune -a
+docker compose exec backend flask db upgrade
+docker compose exec backend flask db current
 ```
 
-### Base de Datos
+Para crear una migración después de modificar modelos:
 
 ```bash
-# Crear usuario de prueba
-docker-compose exec backend python -c "
-from app import app
-from models import db, User
-with app.app_context():
-    user = User(email='test@example.com', password='password123', is_active=True)
-    db.session.add(user)
-    db.session.commit()
-    print('Usuario creado!')
-"
+docker compose exec backend flask db migrate -m "descripcion-del-cambio"
+docker compose exec backend flask db upgrade
 ```
 
-## 🔐 Funcionalidades Implementadas
+Los comandos `insert-test-users` e `insert-test-data` son parametrizados y el segundo exige `--email`; no contienen identidades ni contraseñas reales. Úsalos solo en una base descartable. Consulta [Desarrollo y despliegue](docs/DEVELOPMENT.md#datos-de-prueba).
 
-- ✅ **Configuración completa de Docker**
-- ✅ **Base de datos PostgreSQL con migraciones**
-- ✅ **Panel de administración Flask-Admin**
-- ✅ **CORS configurado**
-- ✅ **Autenticación JWT implementada**
-- ✅ **Servicio API centralizado con interceptores**
-- ✅ **Componente Login funcional**
-- ✅ **Estructura de rutas organizada**
-- ✅ **TypeScript configurado**
-- ✅ **Build optimizado para producción**
+## Comprobaciones
 
-## � Funcionalidades de Autenticación
+```bash
+cd frontend
+pnpm lint
+pnpm exec tsc --noEmit --incremental false -p tsconfig.app.json
+pnpm test:run
+pnpm build
+pnpm audit --audit-level moderate
+```
 
-### Frontend
+```bash
+docker compose -f compose.yaml config --quiet
+docker compose -f compose.yaml -f compose.override.yaml config --quiet
+docker build --file backend/Dockerfile --target test --tag finzen-backend-test .
+docker run --rm -e FLASK_DEBUG=1 -e DATABASE_URL=sqlite:///:memory: \
+  -e JWT_SECRET_KEY=test-only -e CORS_ORIGINS=http://localhost:3000 \
+  finzen-backend-test
+```
 
-- **Servicio API centralizado** (`services/api.ts`) con interceptores automáticos
-- **Componente Login** (`components/Login.tsx`) con manejo de estados
-- **Interceptores JWT** que añaden automáticamente el token a todas las peticiones
-- **Manejo automático de tokens expirados** con redirección al login
+La CI repite lint, typecheck, unit tests, auditoría, builds, Compose y un smoke test Playwright. La cobertura inicial todavía es pequeña; consulta [Estado del proyecto](docs/PROJECT_STATUS.md#validaciones-observadas).
 
-### Backend
+## Reglas de contribución
 
-- **Rutas de autenticación** configuradas en `routes/auth.py`
-- **Middleware JWT** para proteger rutas
-- **Modelos de usuario** con hash de contraseñas
-
-## 📝 Próximos Pasos
-
-1. **Crear APIs CRUD** en routes/users.py
-2. **Agregar más modelos** según necesidades
-3. **Implementar middleware de autorización por roles**
-4. **Agregar tests unitarios**
-5. **Implementar refresh tokens**
-6. **Agregar validación de formularios**
-
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crea una rama para tu feature
-3. Commit tus cambios
-4. Push a la rama
-5. Abre un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT.
+1. Lee [AGENTS.md](AGENTS.md) y el estado técnico antes de modificar código.
+2. No mezcles una migración de esquema con cambios no relacionados.
+3. Mantén montos como `Decimal` en Python y strings en JSON/TypeScript.
+4. Conserva fechas internas en UTC y serialízalas como ISO 8601.
+5. Actualiza la documentación cuando cambie un endpoint, variable, modelo o flujo operativo.
+6. Nunca confirmes secretos, bases de datos, logs, builds ni credenciales de prueba.
